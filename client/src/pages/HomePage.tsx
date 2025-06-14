@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 import { Link } from "react-router-dom";
+import { BackgroundGradient } from "@/components/ui/background-gradient";
 
 const HomePage = () => {
   return (
@@ -9,7 +10,7 @@ const HomePage = () => {
         <h1 className="mb-6 text-4xl font-bold text-foreground md:text-6xl">
           Trello helps teams move
           <br />
-          <span className="animate-shimmer bg-[linear-gradient(110deg,theme(colors.primary),45%,theme(colors.teal.300),55%,theme(colors.primary))] bg-[length:200%_100%] bg-clip-text text-transparent">
+          <span className="animate-shimmer bg-[linear-gradient(110deg,hsl(var(--primary)),45%,hsl(var(--accent)),55%,hsl(var(--primary)))] bg-[length:200%_100%] bg-clip-text text-transparent">
             work forward.
           </span>
         </h1>
@@ -18,9 +19,11 @@ const HomePage = () => {
           high rises to the home office, the way your team works is unique -
           accomplish it all with Trello.
         </p>
-        <Button className="mt-6" size="lg" asChild>
-          <Link to="/auth">Get Started For Free</Link>
-        </Button>
+        <BackgroundGradient containerClassName="rounded-full mt-6" className="p-0">
+          <Button className="w-full" size="lg" asChild>
+            <Link to="/auth">Get Started For Free</Link>
+          </Button>
+        </BackgroundGradient>
       </div>
     </BackgroundBeamsWithCollision>
   );

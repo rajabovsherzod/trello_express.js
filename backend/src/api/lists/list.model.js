@@ -11,6 +11,10 @@ const ListSchema = new Schema({
         ref: 'Board',
         required: [true, 'Board id is required']
     },
+    position: {
+        type: Number,
+        required: true
+    },
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: 'User',

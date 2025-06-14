@@ -1,5 +1,8 @@
 import BoardModel from "./board.model.js";
 import ApiError from "../../utils/api.error.js";
+import ListModel from "../lists/list.model.js";
+import CardModel from "../cards/card.model.js";
+import mongoose from "mongoose";
 
 class BoardService {
     async createBoard(boardData, userId){
@@ -43,13 +46,23 @@ class BoardService {
             throw new ApiError(404, 'Board not found')
         }
 
-        const isMember = board.members.some(member => member.equals(userId))
-
-        if(!isMember){
-            throw new ApiError(403, 'You do not have permission to view this board')
+        if(!board.members.includes(userId)){
+            throw new ApiError(403, 'Forbidden: You are not a member of this board')
         }
 
-        return board
+        const lists = await ListModel.find({ boardId: boardId}).sort({ position: 'asc'}).lean()
+        const cards = await CardModel.find({ boardId: boardId}).sort({ position: 'asc'}).lean()
+
+        lists.forEach(list => {
+            list.cards = cards.filter(card => card.listId.toString() === list._id.toString())
+        })
+
+        const result = {
+            ...board.toObject(),
+            lists
+        }
+
+        return result
     }
 
     async updateBoard(boardId, userId, boardData){
@@ -72,21 +85,32 @@ class BoardService {
     }
 
     async deleteBoard(boardId, userId){
-        const board = await BoardModel.findById(boardId)
+        const session = await mongoose.startSession()
+        session.startTransaction()
 
-        if(!board){
-            throw new ApiError(404, 'Board not found')
+        try {
+            const board = await BoardModel.findById(boardId).session(session)
+
+            if(!board){
+                throw new ApiError(404, 'Board not found')
+            }
+
+            if(!board.owner.equals(userId)){
+                throw new ApiError(403, 'Forbidden: Only the board owner can delete this board');
+            }
+
+            await CardModel.deleteMany({ boardId }).session(session)
+            await ListModel.deleteMany({ boardId }).session(session)
+
+            await BoardModel.findByIdAndDelete(boardId).session(session)
+            
+            await session.commitTransaction()
+        } catch (error) {
+            await session.abortTransaction()
+            throw error
+        } finally{
+            session.endSession()
         }
-
-        const isOwner = board.owner.equals(userId)
-
-        if(!isOwner){
-            throw new ApiError(403, 'You do not have permission to delete this board')
-        }
-
-        await BoardModel.findByIdAndDelete(boardId)
-        
-        return 
     }
 }
 

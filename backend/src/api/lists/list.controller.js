@@ -12,7 +12,7 @@ class ListController {
             const data = await this.listService.createList(boardId, userId, listData)
             res.status(201).json({
                 message: 'List created successfully',
-                list: data
+                data
             })
         } catch (error) {
             next(error)
@@ -27,7 +27,21 @@ class ListController {
             const data = await this.listService.getAllListsForBoard(boardId, userId)
             res.status(200).json({
                 message: 'Lists fetched successfully',
-                ...data
+                data
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    getListById = async (req, res, next) => {
+        try {
+            const { listId } = req.params
+            const userId = req.user.id
+            const data = await this.listService.getListById(listId, userId)
+            res.status(200).json({
+                message: 'List fetched successfully',
+                data
             })
         } catch (error) {
             next(error)
@@ -43,7 +57,7 @@ class ListController {
             const data = await this.listService.updateList(listId, listData, userId)
             res.status(200).json({
                 message: 'List updated successfully',
-                ...data
+                data
             })
         } catch (error) {
             next(error)
@@ -60,6 +74,22 @@ class ListController {
             next(error)
         }
     }
+
+    reorderLists = async (req, res, next) => {
+        try {
+            const { boardId } = req.params
+            const userId = req.user.id
+            const { orderListIds } = req.body
+
+            await this.listService.reorderLists(boardId, userId, orderListIds)
+            res.status(200).json({
+                message: 'Lists reordered successfully'
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+    
 }
 
 export default new ListController(listService)

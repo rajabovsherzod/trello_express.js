@@ -15,5 +15,6 @@ router.delete('/:id', authMiddleware, BoardController.deleteBoard)
 // POST /api/boards/:boardId/lists
 router.post('/:boardId/lists', authMiddleware, ListController.createList);
 router.get('/:boardId/lists', authMiddleware, ListController.getAllListsForBoard);
+router.patch('/:boardId/lists/reorder', authMiddleware, ListController.reorderLists);
 
 export default router

@@ -14,7 +14,7 @@ const HomePage = () => {
     <div className="relative min-h-screen w-full bg-background text-foreground">
       <BackgroundBeamsWithCollision />
       <div className="relative z-10">
-        <div className="flex min-h-[90vh] flex-col items-center justify-center px-4 pt-20 text-center sm:min-h-screen sm:pt-0">
+        <div className="flex flex-col items-center px-4 pt-24 pb-12 text-center md:pt-32 md:pb-20">
           <h1 className="mb-4 text-3xl font-bold text-foreground sm:mb-6 sm:text-4xl md:text-6xl">
             Trello helps teams move
             <br />

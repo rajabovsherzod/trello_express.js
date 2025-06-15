@@ -30,7 +30,7 @@ const Footer = forwardRef<HTMLDivElement>((props, ref) => {
         "py-4 px-6 md:px-8 z-20 flex-shrink-0"
       )}
     >
-      <div className="max-w-screen-xl mx-auto flex justify-between items-center">
+      <div className="max-w-screen-xl mx-auto flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <p className="text-sm text-muted-foreground">
           Powered by{" "}
           <a

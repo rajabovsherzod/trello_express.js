@@ -96,8 +96,8 @@ const LiveDemoBoard = () => {
 
   return (
     <div className="flex justify-center">
-      <div className="rounded-xl border border-border bg-card/50 p-4 shadow-2xl backdrop-blur-sm">
-        <div className="flex gap-4 overflow-x-auto">
+      <div className="rounded-xl border border-border bg-card/50 p-2 shadow-2xl backdrop-blur-sm sm:p-4">
+        <div className="flex flex-col gap-4 lg:flex-row">
           <DndContext
             sensors={sensors}
             onDragStart={onDragStart}

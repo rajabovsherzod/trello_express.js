@@ -14,8 +14,8 @@ const HomePage = () => {
     <div className="relative min-h-screen w-full bg-background text-foreground">
       <BackgroundBeamsWithCollision />
       <div className="relative z-10">
-        <div className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
-          <h1 className="mb-6 text-3xl font-bold text-foreground sm:text-4xl md:text-6xl">
+        <div className="flex min-h-[90vh] flex-col items-center justify-center px-4 pt-20 text-center sm:min-h-screen sm:pt-0">
+          <h1 className="mb-4 text-3xl font-bold text-foreground sm:mb-6 sm:text-4xl md:text-6xl">
             Trello helps teams move
             <br />
             <span className="animate-shimmer bg-[linear-gradient(110deg,hsl(var(--primary)),45%,hsl(var(--accent)),55%,hsl(var(--primary)))] bg-[length:200%_100%] bg-clip-text text-transparent">
@@ -23,21 +23,21 @@ const HomePage = () => {
             </span>
           </h1>
 
-          <div className="mt-8 w-full max-w-4xl">
+          <div className="mt-6 w-full max-w-4xl sm:mt-8">
             <MacbookTerminal>
               <TextGenerateEffect words={paragraphText} />
             </MacbookTerminal>
           </div>
 
-          <BackgroundGradient containerClassName="rounded-full mt-8" className="p-0">
+          <BackgroundGradient containerClassName="rounded-full mt-6 sm:mt-8" className="p-0">
             <Button className="w-full" size="lg" asChild>
               <Link to="/auth">Get Started For Free</Link>
             </Button>
           </BackgroundGradient>
         </div>
 
-        <div className="container mx-auto px-4 py-16 md:py-24">
-          <h2 className="mb-12 text-center text-3xl font-bold md:text-4xl">
+        <div className="container mx-auto px-4 py-12 sm:py-16 md:py-24">
+          <h2 className="mb-8 text-center text-2xl font-bold sm:mb-12 sm:text-3xl md:text-4xl">
             Interactive Live Demo
           </h2>
           <LiveDemoBoard />

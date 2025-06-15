@@ -23,7 +23,7 @@ const MacbookTerminal = ({
         <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
         <div className="w-3 h-3 rounded-full bg-green-500"></div>
       </div>
-      <div className="p-4 text-left font-mono text-xs text-green-400 whitespace-pre-wrap">
+      <div className="p-4 text-left font-mono text-[10px] text-gray-300 sm:text-[11px] md:text-xs whitespace-pre-wrap">
         {children}
       </div>
     </div>

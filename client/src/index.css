@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@layer base {
+  :root,
+  .dark {
+    --background: 165 25% 6%;
+    --foreground: 160 15% 75%;
+    --card: 160 40% 11%;
+    --card-foreground: 160 15% 80%;
+    --popover: 160 50% 8%;
+    --popover-foreground: 160 15% 75%;
+    --primary: 160 90% 45%;
+    --primary-foreground: 160 20% 10%;
+    --secondary: 160 30% 15%;
+    --secondary-foreground: 160 15% 80%;
+    --muted: 160 30% 15%;
+    --muted-foreground: 160 10% 55%;
+    --accent: 160 30% 22%;
+    --accent-foreground: 160 15% 90%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 160 30% 15%;
+    --input: 160 30% 15%;
+    --ring: 160 90% 50%;
+    --radius: 0.75rem;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}

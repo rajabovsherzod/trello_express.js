@@ -1,0 +1,55 @@
+# Trello Clone Backend API
+
+Ushbu loyiha Trello-ga o'xshash ilovaning backend qismi bo'lib, unda doskalar, ro'yxatlar va kartochkalarni boshqarish ko'zda tutilgan. Loyihaning asosiy maqsadi — professional dasturiy ta'minot tamoyillari va toza, modulli arxitekturadan foydalangan holda mustahkam, xavfsiz va masshtablanuvchi RESTful API qurishdir.
+
+## Asosiy Xususiyatlar
+
+- **Toza Arxitektura:** Loyiha `Model-Service-Controller-Route` kabi qatlamli arxitekturadan foydalangan holda qurilgan. Bu mas'uliyatlarni ajratish, kodni kelajakda qo'llab-quvvatlashni osonlashtirish va rivojlantirishni soddalashtirish imkonini beradi.
+- **Xavfsiz Autentifikatsiya va Avtorizatsiya:**
+    - Foydalanuvchilarni davlatsiz (stateless) autentifikatsiya qilish uchun JWT (JSON Web Tokens) ishlatiladi.
+    - Marshrutlarni himoya qilish uchun maxsus `middleware` qo'llaniladi.
+    - Servis qatlamida rolga asoslangan avtorizatsiya mantiqi mavjud (masalan, doskani faqat egasi o'zgartirishi yoki o'chirishi mumkin, a'zolar esa faqat ko'ra oladi).
+- **To'liq CRUD Funksionalligi:** Asosiy `Boards` resursi uchun to'liq Create, Read, Update, va Delete operatsiyalari mavjud.
+- **Samarali Ma'lumotlar Boshqaruvi:**
+    - Katta hajmdagi ma'lumotlar bilan ishlashda unumdorlikni saqlash uchun doskalar ro'yxatini olishda server-tomonlama sahifalash (pagination) qo'llanilgan.
+    - Parallel operatsiyalar uchun `Promise.all` yordamida ma'lumotlar bazasiga so'rovlar optimallashtirilgan.
+- **Professional API Amaliyotlari:**
+    - RESTful tamoyillariga rioya qilingan.
+    - Mijoz tomonida xatoliklarni aniq boshqarish uchun standart HTTP status kodlari (`200`, `201`, `204`, `400`, `401`, `403`, `404`) ishlatiladi.
+    - Xatoliklarni markazlashtirilgan holda boshqaruvchi `middleware` mavjud.
+    - Ruxsat etilmagan ma'lumotlar o'zgarishining oldini olish uchun kiruvchi ma'lumotlarni tozalash (masalan, foydalanuvchining doska egasini o'zgartirishiga yo'l qo'ymaslik).
+
+## Arxitektura
+
+Loyiha mas'uliyatlarni aniq ajratish uchun qatlamli arxitekturaga amal qiladi:
+
+- **`models`**: Ma'lumotlar bazasi kolleksiyalari uchun Mongoose sxemalarini (masalan, `Board`, `User`) belgilaydi.
+- **`routes`**: API endpoint'larini belgilaydi va ularni tegishli kontroller metodlariga bog'laydi. Shuningdek, autentifikatsiya kabi `middleware`larni qo'llaydi.
+- **`controllers`**: Kiruvchi HTTP so'rovlarini qabul qiladi, ma'lumotlarni (yuqori darajada) tekshiradi va tegishli servis metodlarini chaqiradi. Yakuniy HTTP javobini formatlash uchun mas'ul.
+- **`services`**: Ilovaning asosiy biznes mantiqini o'z ichiga oladi. Ma'lumotlar bazasi modellari bilan ishlaydi, murakkab operatsiyalarni bajaradi va avtorizatsiya qoidalarini amalga oshiradi.
+- **`middlewares`**: Foydalanuvchi autentifikatsiyasi, xatoliklarni boshqarish kabi qayta ishlatiladigan funksiyalarni o'z ichiga oladi.
+
+## API Endpoints: Boards
+
+Doskalarni boshqarish uchun quyidagi endpoint'lar mavjud. Barcha endpoint'lar `Bearer Token` orqali autentifikatsiyani talab qiladi.
+
+| Metod    | Endpoint             | Tavsif                                            | Avtorizatsiya Talabi        |
+| :------- | :------------------- | :------------------------------------------------ | :-------------------------- |
+| `POST`   | `/api/boards`        | Yangi doska yaratish.                             | Autentifikatsiyadan o'tgan foydalanuvchi |
+| `GET`    | `/api/boards`        | Foydalanuvchi a'zo bo'lgan doskalarning sahifalangan ro'yxatini olish. | Autentifikatsiyadan o'tgan foydalanuvchi |
+| `GET`    | `/api/boards/:id`    | Yagona doskani uning ID'si orqali olish.          | Doska a'zosi                |
+| `PUT`    | `/api/boards/:id`    | Doska ma'lumotlarini (nomi, tavsifi) yangilash.   | **Faqat doska egasi**       |
+| `DELETE` | `/api/boards/:id`    | Doskani o'chirib tashlash.                        | **Faqat doska egasi**       |
+
+## Ishlatilgan Texnologiyalar
+
+- **Node.js**: JavaScript ishga tushirish muhiti.
+- **Express.js**: Node.js uchun web-freymvork.
+- **MongoDB**: NoSQL ma'lumotlar bazasi.
+- **Mongoose**: MongoDB va Node.js uchun Obyektli Ma'lumotlarni Modellashtirish (ODM) kutubxonasi.
+- **jsonwebtoken**: JSON Web Token'larni yaratish va tekshirish uchun.
+- **bcryptjs**: Foydalanuvchi parollarini xeshlash uchun.
+- **dotenv**: Muhit o'zgaruvchilarini boshqarish uchun.
+
+---
+*Ushbu loyiha backend dasturlash konsepsiyalarini chuqur o'rganish maqsadida yaratilmoqda.*

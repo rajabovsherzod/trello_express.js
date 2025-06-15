@@ -2,8 +2,11 @@ import { Button } from "@/components/ui/button";
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 import { Link } from "react-router-dom";
 import { BackgroundGradient } from "@/components/ui/background-gradient";
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 
 const HomePage = () => {
+  const paragraphText = `Collaborate, manage projects, and reach new productivity peaks. From high rises to the home office, the way your team works is unique - accomplish it all with Trello.`;
+
   return (
     <BackgroundBeamsWithCollision>
       <div className="relative z-20 flex flex-col items-center justify-center text-center">
@@ -14,11 +17,12 @@ const HomePage = () => {
             work forward.
           </span>
         </h1>
-        <p className="mx-auto mt-4 max-w-xs text-sm text-muted-foreground md:max-w-2xl md:text-xl">
-          Collaborate, manage projects, and reach new productivity peaks. From
-          high rises to the home office, the way your team works is unique -
-          accomplish it all with Trello.
-        </p>
+        
+        {/* Paragraf o'rniga TextGenerateEffect */}
+        <div className="mx-auto mt-4 max-w-xs text-sm text-muted-foreground md:max-w-2xl md:text-xl">
+            <TextGenerateEffect words={paragraphText} />
+        </div>
+
         <BackgroundGradient containerClassName="rounded-full mt-6" className="p-0">
           <Button className="w-full" size="lg" asChild>
             <Link to="/auth">Get Started For Free</Link>

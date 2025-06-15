@@ -10,7 +10,7 @@ const AuthPage = () => {
   return (
     <BackgroundBeamsWithCollision>
       <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
-        <div className="mx-auto grid w-[450px] gap-6 p-8 border rounded-lg bg-background/80 backdrop-blur-sm">
+        <div className="w-full max-w-md mx-auto grid gap-6 p-8 border rounded-lg bg-background/80 backdrop-blur-sm">
           <div className="grid gap-2 text-center">
             <div className="mx-auto">
               <Logo />

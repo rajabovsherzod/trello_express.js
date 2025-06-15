@@ -10,7 +10,7 @@ const HomePage = () => {
   return (
     <BackgroundBeamsWithCollision>
       <div className="relative z-20 flex flex-col items-center justify-center text-center">
-        <h1 className="mb-6 text-4xl font-bold text-foreground md:text-6xl">
+        <h1 className="mb-6 text-3xl sm:text-4xl font-bold text-foreground md:text-6xl">
           Trello helps teams move
           <br />
           <span className="animate-shimmer bg-[linear-gradient(110deg,hsl(var(--primary)),45%,hsl(var(--accent)),55%,hsl(var(--primary)))] bg-[length:200%_100%] bg-clip-text text-transparent">
@@ -19,7 +19,7 @@ const HomePage = () => {
         </h1>
         
         {/* Paragraf o'rniga TextGenerateEffect */}
-        <div className="mx-auto mt-4 max-w-xs text-sm text-muted-foreground md:max-w-2xl md:text-xl">
+        <div className="mx-auto mt-4 max-w-xs text-base sm:text-lg text-muted-foreground md:max-w-2xl md:text-xl">
             <TextGenerateEffect words={paragraphText} />
         </div>
 

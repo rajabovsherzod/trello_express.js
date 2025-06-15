@@ -52,13 +52,24 @@ const Navbar = () => {
           >
             {/* Use direct padding to avoid `container` class issues and ensure centering */}
             <div className="p-4 flex flex-col gap-y-4">
-                <div className="p-4 bg-muted/50 rounded-lg flex flex-col gap-y-3">
-                    <Button variant="default" asChild className="w-full">
-                        <Link to="/auth">Get Trello for free</Link>
-                    </Button>
-                    <Button variant="outline" asChild className="w-full">
-                        <Link to="/auth">Login</Link>
-                    </Button>
+                <div className="p-4 bg-muted/50 rounded-lg">
+                    {/* Below sm (640px), buttons are stacked. Above, they are side-by-side. */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <Button variant="outline" asChild className="w-full">
+                            <Link to="/auth" className="flex items-center justify-center">
+                                <span className="font-semibold bg-[linear-gradient(110deg,hsl(var(--primary)),45%,hsl(var(--accent)),55%,hsl(var(--primary)))] bg-[length:200%_100%] bg-clip-text text-transparent animate-shimmer">
+                                    Get Trello for free
+                                </span>
+                            </Link>
+                        </Button>
+                        <Button variant="outline" asChild className="w-full">
+                            <Link to="/auth" className="flex items-center justify-center">
+                                 <span className="font-semibold bg-[linear-gradient(110deg,hsl(var(--primary)),45%,hsl(var(--accent)),55%,hsl(var(--primary)))] bg-[length:200%_100%] bg-clip-text text-transparent animate-shimmer">
+                                    Login
+                                </span>
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
                 <div className="border-t border-border"></div>
                 <div className="flex justify-between items-center px-2">

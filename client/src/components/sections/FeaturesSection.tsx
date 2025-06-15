@@ -1,5 +1,4 @@
-import { cn } from "@/lib/utils";
-import React from "react";
+
 import { BentoGrid, BentoGridItem } from "../ui/bento-grid";
 import { motion } from "framer-motion";
 import {
@@ -16,8 +15,11 @@ import { CustomizableWorkflowsAnimation } from "../animations/CustomizableWorkfl
 export function FeaturesSection() {
   return (
     <section className="py-20">
-        <h2 className="text-4xl md:text-6xl font-bold text-center bg-clip-text text-transparent mb-12 animate-shimmer bg-[linear-gradient(110deg,hsl(var(--primary)),45%,hsl(var(--accent)),55%,hsl(var(--primary)))] bg-[length:200%_100%]">
-            Why Our Trello Clone?
+        <h2 className="text-4xl md:text-6xl font-bold text-center text-foreground mb-12">
+            Why Our{" "}
+            <span className="bg-clip-text text-transparent animate-shimmer bg-[linear-gradient(110deg,hsl(var(--primary)),45%,hsl(var(--accent)),55%,hsl(var(--primary)))] bg-[length:200%_100%]">
+                Trello Clone?
+            </span>
         </h2>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -25,7 +27,8 @@ export function FeaturesSection() {
           transition={{ duration: 0.8, ease: "easeInOut" }}
           viewport={{ once: true }}
         >
-            <BentoGrid className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto rounded-xl border border-border bg-card/50 p-2 shadow-2xl backdrop-blur-sm sm:p-4">
+            <BentoGrid>
             {items.map((item, i) => (
                 <BentoGridItem
                 key={i}
@@ -37,6 +40,7 @@ export function FeaturesSection() {
                 />
             ))}
             </BentoGrid>
+            </div>
         </motion.div>
     </section>
   );

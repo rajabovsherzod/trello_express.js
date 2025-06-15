@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useMediaQuery } from "../../hooks/use-media-query";
 
 const initialData = {
   "To Do": [
@@ -14,8 +15,13 @@ const initialData = {
 
 export const DragAndDropAnimation = () => {
   const [data, setData] = useState(initialData);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
+    if (isMobile) {
+      setData(initialData);
+      return;
+    }
     let step = 0;
     const interval = setInterval(() => {
       setData(currentData => {
@@ -40,7 +46,7 @@ export const DragAndDropAnimation = () => {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isMobile]);
 
   return (
     <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-card p-2 space-x-2 relative">

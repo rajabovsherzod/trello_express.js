@@ -26,9 +26,9 @@ const ColumnContainer = ({ column, cards }: ColumnProps) => {
   return (
     <div
       ref={setNodeRef}
-      className="relative w-[300px] h-full flex flex-col bg-background/50 rounded-lg border border-border flex-shrink-0"
+      className="relative w-full lg:flex-1 h-full flex flex-col bg-background/50 rounded-lg border border-border"
     >
-      <GlowingEffect className="rounded-lg" disabled={false} spread={20} size={200} />
+      <GlowingEffect className="rounded-lg" disabled={false} spread={20} />
       <div className="p-4 font-bold text-md border-b border-border text-left">
         {column.title}
       </div>

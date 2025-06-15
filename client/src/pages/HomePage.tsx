@@ -37,14 +37,16 @@ const HomePage = () => {
           </BackgroundGradient>
         </div>
 
-        <div className="container mx-auto px-4 py-12 sm:py-16 md:py-24">
+        <div className="container mx-auto px-4 pb-12 sm:pb-16 md:pb-24">
           <FeaturesSection />
 
           <div className="mt-16 sm:mt-20 md:mt-24">
             <h2 className="mb-8 text-center text-2xl font-bold sm:mb-12 sm:text-3xl md:text-4xl">
               Interactive Live Demo
             </h2>
-            <LiveDemoBoard />
+            <div className="max-w-5xl mx-auto">
+              <LiveDemoBoard />
+            </div>
           </div>
         </div>
 

@@ -27,8 +27,7 @@ export function FeaturesSection() {
           transition={{ duration: 0.8, ease: "easeInOut" }}
           viewport={{ once: true }}
         >
-            <div className="max-w-5xl mx-auto rounded-xl border border-border bg-card/50 p-2 shadow-2xl backdrop-blur-sm sm:p-4">
-            <BentoGrid>
+            <BentoGrid className="max-w-4xl mx-auto">
             {items.map((item, i) => (
                 <BentoGridItem
                 key={i}
@@ -40,7 +39,6 @@ export function FeaturesSection() {
                 />
             ))}
             </BentoGrid>
-            </div>
         </motion.div>
     </section>
   );

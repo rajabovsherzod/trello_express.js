@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const Footer = forwardRef<HTMLDivElement>((_props, ref) => {
+const Footer = forwardRef<HTMLDivElement>((props, ref) => {
   const socialLinks = [
     {
       href: "https://instagram.com/sherzod.21",
@@ -62,5 +62,4 @@ const Footer = forwardRef<HTMLDivElement>((_props, ref) => {
 
 Footer.displayName = "Footer";
 
-// Forcing git to recognize changes
 export { Footer };

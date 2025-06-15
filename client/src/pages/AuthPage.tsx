@@ -65,4 +65,3 @@ const AuthPage = () => {
 };
 
 export default AuthPage;
-// Force git sync

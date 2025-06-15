@@ -44,7 +44,7 @@ const HomePage = () => {
             <h2 className="mb-8 text-center text-2xl font-bold sm:mb-12 sm:text-3xl md:text-4xl">
               Interactive Live Demo
             </h2>
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-4xl mx-auto">
               <LiveDemoBoard />
             </div>
           </div>

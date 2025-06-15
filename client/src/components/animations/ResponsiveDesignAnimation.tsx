@@ -1,3 +1,4 @@
+import React from "react";
 import { motion } from "framer-motion";
 
 export const ResponsiveDesignAnimation = () => {
@@ -33,4 +34,3 @@ export const ResponsiveDesignAnimation = () => {
     </div>
   );
 };
-// Force git sync

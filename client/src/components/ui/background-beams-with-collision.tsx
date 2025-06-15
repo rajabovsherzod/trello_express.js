@@ -30,10 +30,7 @@ export const BackgroundBeamsWithCollision = ({
   return (
     <div
       ref={parentRef}
-      className={cn(
-        "absolute top-0 left-0 w-full h-full -z-10 overflow-hidden",
-        className
-      )}
+      className={cn("absolute inset-0 -z-10 overflow-hidden", className)}
     >
       {beams.map((beam) => (
         <CollisionMechanism
@@ -71,6 +68,25 @@ const CollisionMechanism = React.forwardRef<
   }
 >(({ parentRef, containerRef, beamOptions = {} }) => {
   const beamRef = useRef<HTMLDivElement>(null);
+  const [parentHeight, setParentHeight] = useState(0);
+
+  useEffect(() => {
+    if (parentRef.current) {
+      const parentElement = parentRef.current;
+
+      const resizeObserver = new ResizeObserver(() => {
+        if (parentElement) {
+          setParentHeight(parentElement.scrollHeight);
+        }
+      });
+
+      resizeObserver.observe(parentElement);
+
+      return () => {
+        resizeObserver.unobserve(parentElement);
+      };
+    }
+  }, [parentRef]);
   const [collision, setCollision] = useState<{
     detected: boolean;
     coordinates: { x: number; y: number } | null;
@@ -141,7 +157,7 @@ const CollisionMechanism = React.forwardRef<
         }}
         variants={{
           animate: {
-            y: beamOptions.translateY || "1800px",
+            y: parentHeight > 0 ? `${parentHeight}px` : "1800px",
             x: beamOptions.translateX || "0px",
             rotate: beamOptions.rotate || 0,
           },

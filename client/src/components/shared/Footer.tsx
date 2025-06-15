@@ -62,4 +62,5 @@ const Footer = forwardRef<HTMLDivElement>((_props, ref) => {
 
 Footer.displayName = "Footer";
 
+// Forcing git to recognize changes
 export { Footer };

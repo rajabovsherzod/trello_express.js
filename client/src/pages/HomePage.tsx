@@ -3,9 +3,11 @@ import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-w
 import { Link } from "react-router-dom";
 import { BackgroundGradient } from "@/components/ui/background-gradient";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
+import { MacbookTerminal } from "@/components/ui/macbook-terminal";
+
 
 const HomePage = () => {
-  const paragraphText = `Collaborate, manage projects, and reach new productivity peaks. From high rises to the home office, the way your team works is unique - accomplish it all with Trello.`;
+  const paragraphText = `// Collaborate, manage projects, and reach new productivity peaks.\n// From high rises to the home office, the way your team works is unique.\n// Accomplish it all with Trello.`;
 
   return (
     <BackgroundBeamsWithCollision>
@@ -19,8 +21,10 @@ const HomePage = () => {
         </h1>
         
         {/* Paragraf o'rniga TextGenerateEffect */}
-        <div className="mx-auto mt-4 max-w-xs text-base sm:text-lg text-muted-foreground md:max-w-2xl md:text-xl">
-            <TextGenerateEffect words={paragraphText} />
+        <div className="mt-8 w-full px-4">
+            <MacbookTerminal>
+                <TextGenerateEffect words={paragraphText} />
+            </MacbookTerminal>
         </div>
 
         <BackgroundGradient containerClassName="rounded-full mt-6" className="p-0">

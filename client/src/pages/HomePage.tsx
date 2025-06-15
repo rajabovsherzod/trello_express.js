@@ -15,7 +15,8 @@ const HomePage = () => {
     <div className="relative min-h-screen w-full bg-background text-foreground">
       <BackgroundBeamsWithCollision />
       <div className="relative z-10">
-        <div className="flex flex-col items-center px-4 pt-24 pb-12 text-center md:pt-32 md:pb-20">
+        <div className="bg-background/30">
+          <div className="flex flex-col items-center px-4 pt-24 pb-12 text-center md:pt-32 md:pb-20">
           <h1 className="mb-4 text-3xl font-bold text-foreground sm:mb-6 sm:text-4xl md:text-6xl">
             Trello helps teams move
             <br />
@@ -35,16 +36,17 @@ const HomePage = () => {
               <Link to="/auth">Get Started For Free</Link>
             </Button>
           </BackgroundGradient>
+          </div>
         </div>
 
         <div className="container mx-auto px-4 pb-12 sm:pb-16 md:pb-24">
-          <FeaturesSection />
+          <div className="max-w-5xl mx-auto">
+            <FeaturesSection />
 
-          <div className="mt-16 sm:mt-20 md:mt-24">
-            <h2 className="mb-8 text-center text-2xl font-bold sm:mb-12 sm:text-3xl md:text-4xl">
-              Interactive Live Demo
-            </h2>
-            <div className="max-w-4xl mx-auto">
+            <div className="mt-16 sm:mt-20 md:mt-24">
+              <h2 className="mb-8 text-center text-2xl font-bold sm:mb-12 sm:text-3xl md:text-4xl">
+                Interactive Live Demo
+              </h2>
               <LiveDemoBoard />
             </div>
           </div>

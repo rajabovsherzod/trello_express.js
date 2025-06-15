@@ -13,7 +13,7 @@ const MacbookTerminal = ({
   return (
     <div
       className={cn(
-        "w-full max-w-3xl mx-auto rounded-xl border border-white/20", // Removed background and shadow for transparency
+        "w-full max-w-3xl mx-auto rounded-xl border border-white/20 bg-background/80 backdrop-blur-sm",
         className
       )}
       {...props}

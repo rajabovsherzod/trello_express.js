@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const Footer = forwardRef<HTMLDivElement>((props, ref) => {
+const Footer = forwardRef<HTMLDivElement>((_props, ref) => {
   const socialLinks = [
     {
       href: "https://instagram.com/sherzod.21",

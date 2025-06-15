@@ -4,73 +4,34 @@ import { motion, AnimatePresence } from "framer-motion";
 import React, { useRef, useState, useEffect } from "react";
 
 export const BackgroundBeamsWithCollision = ({
-  children,
   className,
 }: {
-  children: React.ReactNode;
   className?: string;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const parentRef = useRef<HTMLDivElement>(null);
 
   const beams = [
-    {
-      initialX: 10,
-      translateX: 10,
-      duration: 7,
-      repeatDelay: 3,
-      delay: 2,
-    },
-    {
-      initialX: 600,
-      translateX: 600,
-      duration: 3,
-      repeatDelay: 3,
-      delay: 4,
-    },
-    {
-      initialX: 100,
-      translateX: 100,
-      duration: 7,
-      repeatDelay: 7,
-      className: "h-6",
-    },
-    {
-      initialX: 400,
-      translateX: 400,
-      duration: 5,
-      repeatDelay: 14,
-      delay: 4,
-    },
-    {
-      initialX: 800,
-      translateX: 800,
-      duration: 11,
-      repeatDelay: 2,
-      className: "h-20",
-    },
-    {
-      initialX: 1000,
-      translateX: 1000,
-      duration: 4,
-      repeatDelay: 2,
-      className: "h-12",
-    },
-    {
-      initialX: 1200,
-      translateX: 1200,
-      duration: 6,
-      repeatDelay: 4,
-      delay: 2,
-      className: "h-6",
-    },
+    { initialX: 10, translateX: 10, duration: 7, repeatDelay: 3, delay: 2 },
+    { initialX: 600, translateX: 600, duration: 3, repeatDelay: 3, delay: 4 },
+    { initialX: 100, translateX: 100, duration: 7, repeatDelay: 7, className: "h-6" },
+    { initialX: 400, translateX: 400, duration: 5, repeatDelay: 14, delay: 4 },
+    { initialX: 800, translateX: 800, duration: 11, repeatDelay: 2, className: "h-20" },
+    { initialX: 1000, translateX: 1000, duration: 4, repeatDelay: 2, className: "h-12" },
+    { initialX: 1200, translateX: 1200, duration: 6, repeatDelay: 4, delay: 2, className: "h-6" },
+    { initialX: 200, translateX: 200, duration: 8, repeatDelay: 5, delay: 1, className: "h-10" },
+    { initialX: 500, translateX: 500, duration: 4, repeatDelay: 10, delay: 3 },
+    { initialX: 700, translateX: 700, duration: 9, repeatDelay: 1, delay: 0, className: "h-16" },
+    { initialX: 900, translateX: 900, duration: 6, repeatDelay: 6, delay: 1.5, className: "h-8" },
+    { initialX: 1100, translateX: 1100, duration: 5, repeatDelay: 8, delay: 3.5 },
+    { initialX: 1300, translateX: 1300, duration: 10, repeatDelay: 3, delay: 2.5, className: "h-14" },
   ];
 
   return (
     <div
       ref={parentRef}
       className={cn(
-        "h-screen bg-background relative flex items-center w-full justify-center overflow-hidden",
+        "absolute top-0 left-0 w-full h-full -z-10 overflow-hidden",
         className
       )}
     >
@@ -83,14 +44,9 @@ export const BackgroundBeamsWithCollision = ({
         />
       ))}
 
-      {children}
       <div
         ref={containerRef}
-        className="absolute bottom-0 bg-secondary w-full inset-x-0 pointer-events-none"
-        style={{
-          boxShadow:
-            "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset",
-        }}
+        className="absolute bottom-0 w-full inset-x-0 pointer-events-none"
       ></div>
     </div>
   );
@@ -199,7 +155,7 @@ const CollisionMechanism = React.forwardRef<
           repeatDelay: beamOptions.repeatDelay || 0,
         }}
         className={cn(
-          "absolute left-0 top-20 m-auto h-14 w-px rounded-full bg-gradient-to-t from-primary via-teal-500 to-transparent",
+          "absolute left-0 top-20 m-auto h-14 w-px rounded-full bg-gradient-to-t from-teal-500 via-cyan-500 to-transparent",
           beamOptions.className
         )}
       />
@@ -238,7 +194,7 @@ const Explosion = ({ ...props }: React.HTMLProps<HTMLDivElement>) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 1.5, ease: "easeOut" }}
-        className="absolute -inset-x-10 top-0 m-auto h-2 w-10 rounded-full bg-gradient-to-r from-transparent via-primary to-transparent blur-sm"
+        className="absolute -inset-x-10 top-0 m-auto h-2 w-10 rounded-full bg-gradient-to-r from-transparent via-teal-500 to-transparent blur-sm"
       ></motion.div>
       {spans.map((span) => (
         <motion.span
@@ -250,7 +206,7 @@ const Explosion = ({ ...props }: React.HTMLProps<HTMLDivElement>) => {
             opacity: 0,
           }}
           transition={{ duration: Math.random() * 1.5 + 0.5, ease: "easeOut" }}
-          className="absolute h-1 w-1 rounded-full bg-gradient-to-b from-teal-400 to-primary"
+          className="absolute h-1 w-1 rounded-full bg-gradient-to-b from-teal-400 to-cyan-500"
         />
       ))}
     </div>

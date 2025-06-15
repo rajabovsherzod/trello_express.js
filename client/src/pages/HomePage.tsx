@@ -5,6 +5,7 @@ import { BackgroundGradient } from "@/components/ui/background-gradient";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { MacbookTerminal } from "@/components/ui/macbook-terminal";
 import LiveDemoBoard from "@/components/dnd/LiveDemoBoard";
+import { FeaturesSection } from "@/components/sections/FeaturesSection";
 import { Footer } from "@/components/shared/Footer";
 
 const HomePage = () => {
@@ -37,10 +38,14 @@ const HomePage = () => {
         </div>
 
         <div className="container mx-auto px-4 py-12 sm:py-16 md:py-24">
-          <h2 className="mb-8 text-center text-2xl font-bold sm:mb-12 sm:text-3xl md:text-4xl">
-            Interactive Live Demo
-          </h2>
-          <LiveDemoBoard />
+          <FeaturesSection />
+
+          <div className="mt-16 sm:mt-20 md:mt-24">
+            <h2 className="mb-8 text-center text-2xl font-bold sm:mb-12 sm:text-3xl md:text-4xl">
+              Interactive Live Demo
+            </h2>
+            <LiveDemoBoard />
+          </div>
         </div>
 
         <Footer />

@@ -52,7 +52,7 @@ export const BackgroundBeamsWithCollision = ({
   );
 };
 
-const CollisionMechanism = React.forwardRef<
+const CollisionMechanism = React.forwardRef< 
   HTMLDivElement,
   {
     containerRef: React.RefObject<HTMLDivElement | null>;
@@ -69,7 +69,7 @@ const CollisionMechanism = React.forwardRef<
       repeatDelay?: number;
     };
   }
->(({ parentRef, containerRef, beamOptions = {} }) => {
+>(({ parentRef, containerRef, beamOptions = {} }, _ref) => {
   const beamRef = useRef<HTMLDivElement>(null);
   const [parentHeight, setParentHeight] = useState(0);
 
@@ -93,7 +93,7 @@ const CollisionMechanism = React.forwardRef<
   const [collision, setCollision] = useState<{
     detected: boolean;
     coordinates: { x: number; y: number } | null;
-  }>({
+  }>({ 
     detected: false,
     coordinates: null,
   });
@@ -132,7 +132,7 @@ const CollisionMechanism = React.forwardRef<
     const animationInterval = setInterval(checkCollision, 50);
 
     return () => clearInterval(animationInterval);
-  }, [cycleCollisionDetected, containerRef, parentRef]);
+  }, [cycleCollisionDetected, containerRef, parentRef, beamRef]);
 
   useEffect(() => {
     if (collision.detected && collision.coordinates) {

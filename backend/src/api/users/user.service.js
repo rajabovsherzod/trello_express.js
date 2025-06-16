@@ -1,7 +1,8 @@
 import userModel from "./user.model.js";
 import { UserDto }  from "./user.dto.js";
-import { generateTokens } from "./token.service.js";
+import { generateTokens, removeToken, validateRefreshToken, findToken } from "./token.service.js";
 import ApiError from "../../utils/api.error.js";
+
 
 class UserService {
     async register(userData){
@@ -15,7 +16,7 @@ class UserService {
 
         const newUser = await userModel.create(userData)
         const userDto = new UserDto(newUser)
-        const tokens = generateTokens({...userDto})
+        const tokens = await generateTokens({...userDto})
         return ({user: userDto, ...tokens})
     }
 
@@ -32,14 +33,44 @@ class UserService {
             throw new ApiError(401, 'Invalid credentials')
         }
 
-        const payload = {
-            id: user._id,
-            email: user.email,
-            username: user.username
+        const userDto = new UserDto(user);
+        const tokens = await generateTokens({...userDto})
+
+        return ({
+            ...tokens,
+            user: userDto
+        })
+    }
+
+    async logout(refreshToken){
+        if(!refreshToken){
+            return 
         }
 
-        const userDto = new UserDto(user);
-        const tokens = generateTokens(payload)
+        const tokenData = await removeToken(refreshToken)
+        return tokenData
+    }
+
+    async refresh(refreshToken){
+        if(!refreshToken){
+            throw new ApiError(401, 'User is not authenticated')
+        }
+
+        const userDataFromToken = validateRefreshToken(refreshToken)
+        const tokenFromDb = await findToken(refreshToken)
+
+        if(!userDataFromToken || !tokenFromDb){
+            throw new ApiError(401, 'User is not authenticated')
+        }
+
+        const user = await userModel.findById(userDataFromToken.id)
+
+        if(!user){
+            throw new ApiError(401, 'User not found')
+        }
+
+        const userDto = new UserDto(user)
+        const tokens = await generateTokens({...userDto})
 
         return ({
             ...tokens,

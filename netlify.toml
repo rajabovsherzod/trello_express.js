@@ -1,7 +1,7 @@
 [build]
-  base    = "client"
-  command = "echo 'DEBUG: Listing files...' && ls -R client/src/components && echo '--- DEBUG: Footer.tsx content ---' && cat client/src/components/shared/Footer.tsx | head -n 15 && echo '--- DEBUG: End of debug ---' && npm run build"
-  publish = "dist"
+  base = "client"
+  command = "cd client && npm install && npm run build"
+  publish = "client/dist"
 
 [[redirects]]
   from = "/*"

@@ -29,7 +29,7 @@ class UserController {
             }
 
             const userData = await this.userService.login(login, password)
-            res.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
+            res.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict'})
 
             res.status(200).json({
                 message: 'Login was successfull',
@@ -47,6 +47,32 @@ class UserController {
             res.status(200).json({
                 message: "User data retrieved successfully",
                 user: userDto
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    logout = async (req, res, next) => {
+        try {
+            const { refreshToken } = req.cookies
+            await this.userService.logout(refreshToken)
+            res.clearCookie('refreshToken')
+            res.status(200).json({message: 'Logout was successfull'})
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    refresh = async (req, res, next) => {
+        try {
+            const { refreshToken } = req.cookies
+            const userData = await this.userService.refresh(refreshToken)
+            res.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict'})
+            res.status(200).json({
+                message: 'Refresh was successfull',
+                accessToken: userData.accessToken,
+                user: userData.user
             })
         } catch (error) {
             next(error)

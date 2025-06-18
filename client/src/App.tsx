@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from '@/components/shared/Navbar';
 import { ThemeProvider } from '@/components/providers/theme-provider';
+import { Toaster } from 'sonner';
 import { useEffect } from 'react';
 import { refreshToken } from './api/auth';
 import { userAuthStore } from './store/auth.store';

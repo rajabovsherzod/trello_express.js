@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import type { HTMLAttributes } from "react";
 import {
   Twitter,
   Linkedin,
@@ -9,7 +10,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const Footer = forwardRef<HTMLDivElement>((props, ref) => {
+interface FooterProps extends HTMLAttributes<HTMLElement> {}
+
+const Footer = forwardRef<HTMLElement, FooterProps>(({ className, ...props }, ref) => {
   const socialLinks = [
     {
       href: "https://instagram.com/sherzod.21",
@@ -27,12 +30,14 @@ const Footer = forwardRef<HTMLDivElement>((props, ref) => {
       ref={ref}
       className={cn(
         "w-full bg-background/80 backdrop-blur-sm border-t border-border",
-        "py-4 px-6 md:px-8 z-20 flex-shrink-0"
+        "py-4 px-6 md:px-8 z-20 flex-shrink-0 mt-16",
+        className
       )}
+      {...props}
     >
       <div className="max-w-screen-xl mx-auto flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <p className="text-sm text-muted-foreground">
-          Powered by{" "}
+          Powered by{" "}
           <a
             href="https://github.com/rajabovsherzod"
             target="_blank"

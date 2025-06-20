@@ -1,13 +1,15 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from '@/components/shared/Navbar';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { Toaster } from 'sonner';
 import { useEffect } from 'react';
 import { refreshToken as refreshTokenApi } from './api/auth';
 import { userAuthStore } from './store/auth.store';
+import { Footer } from '@/components/shared/Footer';
 
 function App() {
-  const { refreshToken, setUserAndTokens, logout } = userAuthStore();
+  const { refreshToken, setTokens, logout } = userAuthStore();
+  const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -19,7 +21,7 @@ function App() {
 
       try {
         const { user, accessToken, refreshToken: newRefreshToken } = await refreshTokenApi(refreshToken);
-        setUserAndTokens(user, accessToken, newRefreshToken);
+        setTokens(accessToken, newRefreshToken, user);
       } catch (error) {
         console.error("Failed to refresh token:", error);
         logout(); // Token yaroqsiz bo'lsa, tizimdan chiqarib yuboramiz
@@ -34,7 +36,7 @@ function App() {
     // Komponent yo'q qilinganda intervalni tozalash
     return () => clearInterval(interval);
 
-  }, [refreshToken, setUserAndTokens, logout]);
+  }, [refreshToken, setTokens, logout]);
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="trello-theme-final">
@@ -44,6 +46,7 @@ function App() {
         <main className="flex-1 pt-14">
           <Outlet />
         </main>
+        {!location.pathname.startsWith('/auth') && <Footer />}
       </div>
     </ThemeProvider>
   );

@@ -6,7 +6,6 @@ import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { MacbookTerminal } from "@/components/ui/macbook-terminal";
 import LiveDemoBoard from "@/components/dnd/LiveDemoBoard";
 import { FeaturesSection } from "@/components/sections/FeaturesSection";
-import { Footer } from "@/components/shared/Footer";
 
 const HomePage = () => {
   const paragraphText = `// Collaborate, manage projects, and reach new productivity peaks.\n// From high rises to the home office, the way your team works is unique.\n// Accomplish it all with Trello.`;
@@ -51,8 +50,6 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-
-        <Footer />
       </div>
     </div>
   );

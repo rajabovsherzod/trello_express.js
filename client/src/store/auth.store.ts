@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 import type { IUser } from "@/types";
 
 // Brauzerda xavfsiz tarzda tokenlarni olish uchun yordamchi funksiyalar
@@ -15,8 +15,9 @@ interface AuthStore {
     accessToken: string | null;
     refreshToken: string | null;
     isAuthenticated: boolean;
-    setUserAndTokens: (user: IUser, accessToken: string, refreshToken: string) => void;
+    login: (userData: IUser, accessToken: string, refreshToken: string) => void;
     logout: () => void;
+    setTokens: (accessToken: string, refreshToken: string, user: IUser) => void;
 }
 
 const initialAccessToken = getInitialToken('accessToken');
@@ -29,11 +30,11 @@ export const userAuthStore = create<AuthStore>()(
             accessToken: initialAccessToken,
             refreshToken: initialRefreshToken,
             isAuthenticated: !!initialAccessToken,
-            setUserAndTokens: (user, accessToken, refreshToken) => {
+            login: (userData, accessToken, refreshToken) => {
                 localStorage.setItem('accessToken', accessToken);
                 localStorage.setItem('refreshToken', refreshToken);
                 set({
-                    user,
+                    user: userData,
                     accessToken,
                     refreshToken,
                     isAuthenticated: true,
@@ -49,9 +50,20 @@ export const userAuthStore = create<AuthStore>()(
                     isAuthenticated: false,
                 });
             },
+            setTokens: (accessToken, refreshToken, user) => {
+                localStorage.setItem('accessToken', accessToken);
+                localStorage.setItem('refreshToken', refreshToken);
+                set({
+                    user,
+                    accessToken,
+                    refreshToken,
+                    isAuthenticated: true,
+                });
+            },
         }),
         {
             name: 'auth-storage',
+            storage: createJSONStorage(() => localStorage),
         }
     )
 );

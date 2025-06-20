@@ -16,13 +16,13 @@ import { useNavigate } from "react-router-dom";
 const AuthPage = () => {
   const [mode, setMode] = useState<"login" | "register">("login");
   const navigate = useNavigate()
-  const setUserAndTokens = userAuthStore((state) => state.setUserAndTokens);
+  const loginUserStore = userAuthStore((state) => state.login);
 
   const {mutate: register, isPending: registerPending} = useMutation({
     mutationKey: ["register"],
     mutationFn: registerUser,
     onSuccess: (data) => {
-      setUserAndTokens(data.user, data.accessToken, data.refreshToken) 
+      loginUserStore(data.user, data.accessToken, data.refreshToken) 
       navigate('/dashboard');
       toast.success("You have successfully registered")
     },
@@ -37,7 +37,7 @@ const AuthPage = () => {
     mutationKey: ["login"],
     mutationFn: loginUser,
     onSuccess: (data) => {
-      setUserAndTokens(data.user, data.accessToken, data.refreshToken)
+      loginUserStore(data.user, data.accessToken, data.refreshToken)
       navigate('/dashboard');
       toast.success("You have successfully logged in")
     },
@@ -53,7 +53,17 @@ const AuthPage = () => {
 
   function onSubmit(values: LoginFormValues | RegisterFormValues) {
     if (mode === "login") {
-      login(values as LoginFormValues)
+      const { login: loginIdentifier, password } = values as LoginFormValues;
+
+      // Email yoki username ekanligini tekshiramiz
+      const isEmail = loginIdentifier.includes('@');
+      
+      const loginData = {
+        password,
+        ...(isEmail ? { email: loginIdentifier } : { username: loginIdentifier })
+      };
+
+      login(loginData as any) // `any` ishlatishga majburmiz, chunki tip murakkablashdi
     } else {
       register(values as RegisterFormValues)
     }

@@ -63,12 +63,12 @@ export const useBoardsStore = create<BoardsStore>()(
       getBoardById: (boardId) => get().boards.find((b) => b._id === boardId),
       getBoardLists: (boardId) => {
         const board = get().boards.find((b) => b._id === boardId);
-        return board ? board.lists : [];
+        return board ? board.lists || [] : [];
       },
       getBoardCards: (boardId, listId) => {
         const board = get().boards.find((b) => b._id === boardId);
         if (!board) return [];
-        const list = board.lists.find((l) => l._id === listId);
+        const list = (board.lists || []).find((l) => l._id === listId);
         return list ? list.cards : [];
       },
       // List CRUD
@@ -84,7 +84,7 @@ export const useBoardsStore = create<BoardsStore>()(
             b._id === boardId
               ? {
                   ...b,
-                  lists: b.lists.map((l) =>
+                  lists: (b.lists || []).map((l) =>
                     l._id === listUpdate._id ? { ...l, ...listUpdate } : l
                   ),
                 }
@@ -95,7 +95,7 @@ export const useBoardsStore = create<BoardsStore>()(
         set((state) => ({
           boards: state.boards.map((b) =>
             b._id === boardId
-              ? { ...b, lists: b.lists.filter((l) => l._id !== listId) }
+              ? { ...b, lists: (b.lists || []).filter((l) => l._id !== listId) }
               : b
           ),
         })),
@@ -106,7 +106,7 @@ export const useBoardsStore = create<BoardsStore>()(
             b._id === boardId
               ? {
                   ...b,
-                  lists: b.lists.map((l) =>
+                  lists: (b.lists || []).map((l) =>
                     l._id === listId ? { ...l, cards: [...l.cards, card] } : l
                   ),
                 }
@@ -119,7 +119,7 @@ export const useBoardsStore = create<BoardsStore>()(
             b._id === boardId
               ? {
                   ...b,
-                  lists: b.lists.map((l) =>
+                  lists: (b.lists || []).map((l) =>
                     l._id === listId
                       ? {
                           ...l,
@@ -139,7 +139,7 @@ export const useBoardsStore = create<BoardsStore>()(
             b._id === boardId
               ? {
                   ...b,
-                  lists: b.lists.map((l) =>
+                  lists: (b.lists || []).map((l) =>
                     l._id === listId
                       ? { ...l, cards: l.cards.filter((c) => c._id !== cardId) }
                       : l
@@ -151,7 +151,7 @@ export const useBoardsStore = create<BoardsStore>()(
     }),
     {
       name: 'boards-storage',
-      partialize: (state) => ({ boards: state.boards }), // Faqat doskalarni saqlaymiz
+      partialize: (state) => ({ boards: state.boards }), 
     }
   )
 );

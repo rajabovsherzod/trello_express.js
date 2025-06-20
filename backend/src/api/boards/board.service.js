@@ -6,9 +6,13 @@ import mongoose from "mongoose";
 
 class BoardService {
     async createBoard(boardData, userId){
-
-        const newBoard = await BoardModel.create({...boardData, owner: userId})
-        return newBoard
+        const boardPayload = {
+            ...boardData,
+            owner: userId,
+            members: [userId]
+        };
+        const newBoard = await BoardModel.create(boardPayload);
+        return newBoard;
     }
 
     async getBoardsForUser(userId, queryOptions = {}){

@@ -2,14 +2,19 @@ import { Router } from "express";
 import authMiddleware from "../../middlewares/auth.middleware.js";
 import BoardController from "./board.controller.js";
 import ListController from "../lists/list.controller.js";
+import BoardService from "./board.service.js";
 
 const router = Router()
 
-router.post('/', authMiddleware, BoardController.create)
-router.get('/', authMiddleware, BoardController.getBoardsForUser)
-router.get('/:id', authMiddleware, BoardController.getBoardById)
-router.put('/:id', authMiddleware, BoardController.updateBoard)
-router.delete('/:id', authMiddleware, BoardController.deleteBoard)
+// Controller instansini servis bilan birga yaratamiz
+const boardController = new BoardController(BoardService)
+
+// Barcha yo'nalishlar endi yaratilgan instansning metodlarini chaqiradi
+router.post('/', authMiddleware, boardController.create)
+router.get('/', authMiddleware, boardController.getBoardsForUser)
+router.get('/:id', authMiddleware, boardController.getBoardById)
+router.put('/:id', authMiddleware, boardController.updateBoard)
+router.delete('/:id', authMiddleware, boardController.deleteBoard)
 
 // Nested route for lists within a board
 // POST /api/boards/:boardId/lists

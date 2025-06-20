@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs'
 import userModel from "./user.model.js";
 import { UserDto }  from "./user.dto.js";
 import { generateTokens, removeToken, validateRefreshToken, findToken } from "./token.service.js";
@@ -5,77 +6,65 @@ import ApiError from "../../utils/api.error.js";
 
 
 class UserService {
-    async register(userData){
-        const existingUser = await userModel.findOne({
-            $or: [{email: userData.email}, {username: userData.username}]
-        })
-
-        if(existingUser){
-            throw new ApiError(409, 'User with this email or username already exists.')
+    async register(username, email, password) {
+        const candidate = await userModel.findOne({ email })
+        if (candidate) {
+            throw ApiError.BadRequest(`User with email ${email} already exists`)
         }
 
-        const newUser = await userModel.create(userData)
-        const userDto = new UserDto(newUser)
-        const tokens = await generateTokens({...userDto})
-        return ({user: userDto, ...tokens})
+        const hashedPassword = await bcrypt.hash(password, 10)
+        const user = await userModel.create({ username, email, password: hashedPassword })
+        
+        const userDto = new UserDto(user)
+        const tokens = await generateTokens({ ...userDto })
+
+        return { ...tokens, user: userDto }
     }
 
-    async login(login, password){
-        const user = await userModel.findOne({$or: [{email: login}, {username: login}]}).select('+password')
+    async login({ email, username, password }) {
+        const user = await userModel.findOne({
+            $or: [{ email }, { username }]
+        }).select('+password');
 
-        if(!user){
-            throw new ApiError(401, 'Invalid credentials')
+        if (!user) {
+            throw ApiError.BadRequest('User not found with provided credentials')
         }
 
-        const isPasswordMatch = await user.comparePassword(password)
-
-        if(!isPasswordMatch){
-            throw new ApiError(401, 'Invalid credentials')
-        }
-
-        const userDto = new UserDto(user);
-        const tokens = await generateTokens({...userDto})
-
-        return ({
-            ...tokens,
-            user: userDto
-        })
-    }
-
-    async logout(refreshToken){
-        if(!refreshToken){
-            return 
-        }
-
-        const tokenData = await removeToken(refreshToken)
-        return tokenData
-    }
-
-    async refresh(refreshToken){
-        if(!refreshToken){
-            throw new ApiError(401, 'User is not authenticated')
-        }
-
-        const userDataFromToken = validateRefreshToken(refreshToken)
-        const tokenFromDb = await findToken(refreshToken)
-
-        if(!userDataFromToken || !tokenFromDb){
-            throw new ApiError(401, 'User is not authenticated')
-        }
-
-        const user = await userModel.findById(userDataFromToken.id)
-
-        if(!user){
-            throw new ApiError(401, 'User not found')
+        const isPassEquals = await bcrypt.compare(password, user.password)
+        if (!isPassEquals) {
+            throw ApiError.BadRequest('Invalid password')
         }
 
         const userDto = new UserDto(user)
-        const tokens = await generateTokens({...userDto})
+        const tokens = await generateTokens({ ...userDto })
 
-        return ({
-            ...tokens,
-            user: userDto
-        })
+        return { ...tokens, user: userDto }
+    }
+
+    async logout(refreshToken) {
+        if (!refreshToken) {
+            throw ApiError.BadRequest("Refresh token not provided");
+        }
+        await removeToken(refreshToken)
+    }
+
+    async refresh(refreshToken) {
+        if (!refreshToken) {
+            throw ApiError.UnauthorizedError()
+        }
+
+        const userData = validateRefreshToken(refreshToken)
+        const tokenFromDb = await findToken(refreshToken)
+
+        if (!userData || !tokenFromDb) {
+            throw ApiError.UnauthorizedError()
+        }
+
+        const user = await userModel.findById(userData.id)
+        const userDto = new UserDto(user)
+        const tokens = await generateTokens({ ...userDto })
+
+        return { ...tokens, user: userDto }
     }
     
 }

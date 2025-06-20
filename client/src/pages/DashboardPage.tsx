@@ -24,7 +24,7 @@ const DashboardPage = () => {
               {Array.from({ length: 4 }).map((_, i) => (
                   <Skeleton key={i} className="h-40 w-full rounded-xl" />
               ))}
-          </div>
+      </div>
         )}
 
         {error && (
@@ -34,30 +34,30 @@ const DashboardPage = () => {
               <p className="text-xs mt-4 font-mono bg-red-500/20 p-2 rounded">Error: {error}</p>
           </div>
         )}
-
+      
         {boards.length > 0 && (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {boards.map((board) => (
-              <BoardCard
+            <BoardCard 
                 key={board._id}
                 boardId={board._id}
-                title={board.name}
+              title={board.name} 
                 authorName={board.owner?.username || 'Unknown'}
                 background={board.background || '#6d28d9'}
                 memberCount={board.members?.length || 0}
-              />
-            ))}
-          </div>
-        )}
+            />
+          ))}
+        </div>
+      )}
 
-        {!isLoading && !error && boards.length === 0 && (
+      {!isLoading && !error && boards.length === 0 && (
           <div className="mt-16 text-center border-2 border-dashed border-muted-foreground/30 p-12 rounded-xl">
               <h2 className="text-2xl font-semibold text-foreground">No Boards Yet!</h2>
               <p className="text-muted-foreground mt-2 max-w-md mx-auto">
                   It looks a bit empty here. Click the button above to create your first board and start organizing your tasks.
               </p>
-          </div>
-        )}
+        </div>
+      )}
       </div>
     </div>
   );

@@ -5,31 +5,53 @@ import { LayoutDashboard, LogOut, User, Settings, Menu } from 'lucide-react';
 import { userAuthStore } from '@/store/auth.store';
 import { useNavigate } from 'react-router-dom';
 import { Separator } from "../ui/separator";
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import type { Variants } from 'framer-motion';
+import React, { useState } from "react";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
-// Panel ichidagi menyu bandlari uchun animatsiyali komponent
-const NavLink = ({ icon, text, onClick, isLast = false }: { icon: React.ReactNode, text: string, onClick?: () => void, isLast?: boolean }) => {
+// Navigatsiya menyusi bandi
+const NavLink = ({ icon, text, onClick }: { icon: React.ReactNode, text: string, onClick?: () => void }) => {
     return (
-        <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="w-full"
+        <Button
+            variant="ghost"
+            onClick={onClick}
+            className="w-full flex items-center justify-start gap-3 p-3 text-base h-auto"
         >
-            <Button
-                variant="ghost"
-                onClick={onClick}
-                className="w-full flex items-center justify-start gap-4 p-6 text-lg h-auto"
-            >
-                <span className="text-primary">{icon}</span>
-                <span>{text}</span>
-            </Button>
-            {!isLast && <Separator className="bg-primary/10 mt-1" />}
-        </motion.div>
+            <span className="text-muted-foreground">{icon}</span>
+            <span className="text-foreground">{text}</span>
+        </Button>
     )
-}
+};
 
+// Xatolikni tuzatish uchun maxsus trigger komponenti
+const ConditionalTrigger = React.forwardRef<HTMLButtonElement>((props, ref) => {
+    const isMobile = useMediaQuery("(max-width: 768px)");
+    const user = userAuthStore((state) => state.user);
+    const userInitial = user?.username ? user.username.charAt(0).toUpperCase() : "U";
+
+    if (isMobile) {
+        return (
+            <Button {...props} ref={ref} variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+            </Button>
+        );
+    }
+
+    return (
+        <Button {...props} ref={ref} variant="ghost" className="relative h-10 w-10 rounded-full">
+            <Avatar className="h-10 w-10 border-2 border-transparent hover:border-primary transition-colors duration-300">
+                <AvatarImage src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${user?.username}`} alt={user?.username} />
+                <AvatarFallback>{userInitial}</AvatarFallback>
+            </Avatar>
+        </Button>
+    );
+});
+ConditionalTrigger.displayName = 'ConditionalTrigger';
+
+// Asosiy Komponent
 export const UserProfileSheet = () => {
+    const [isOpen, setIsOpen] = useState(false);
     const user = userAuthStore((state) => state.user);
     const logout = userAuthStore((state) => state.logout);
     const navigate = useNavigate();
@@ -37,87 +59,74 @@ export const UserProfileSheet = () => {
     const handleLogout = () => {
         logout();
         navigate('/auth');
+        setIsOpen(false);
     };
 
     const userInitial = user?.username ? user.username.charAt(0).toUpperCase() : "U";
-
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.15, // Har bir bola element 0.15s kechikish bilan chiqadi
-                delayChildren: 0.2,    // Animatsiya boshlanishidan oldin kutish
-            }
-        }
+    
+    const sheetVariants: Variants = {
+        hidden: { x: "100%", opacity: 0 },
+        visible: { x: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 30 } },
+        exit: { x: "100%", opacity: 0, transition: { type: "tween", ease: "easeInOut", duration: 0.3 } }
     };
 
     return (
-        <Sheet>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className="h-10 w-10 border-2 border-transparent hover:border-primary transition-colors duration-300">
-                        <AvatarImage src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${user?.username}`} alt={user?.username} />
-                        <AvatarFallback>{userInitial}</AvatarFallback>
-                    </Avatar>
-                </Button>
+                <ConditionalTrigger />
             </SheetTrigger>
-            <SheetContent className="w-[320px] sm:w-[400px] bg-background/80 backdrop-blur-xl border-l-primary/10 p-0 flex flex-col">
-                <SheetHeader className="p-6">
-                    <SheetTitle className="text-2xl font-bold text-center text-primary">
-                        My Profile
-                    </SheetTitle>
-                </SheetHeader>
-                <Separator className="bg-primary/20" />
-
-                {/* Foydalanuvchi ma'lumotlari */}
-                <motion.div 
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, ease: "backOut" }}
-                    className="flex flex-col items-center gap-4 p-8"
-                >
-                    <Avatar className="h-24 w-24 border-4 border-primary/20 shadow-lg">
-                        <AvatarImage src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${user?.username}`} alt={user?.username} />
-                        <AvatarFallback className="text-4xl">{userInitial}</AvatarFallback>
-                    </Avatar>
-                    <div className="text-center">
-                        <p className="text-xl font-bold text-foreground">{user?.username}</p>
-                        <p className="text-sm text-muted-foreground">{user?.email}</p>
-                    </div>
-                </motion.div>
-
-                <Separator className="bg-primary/20" />
-
-                {/* Navigatsiya tugmalari */}
-                <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="flex-grow flex flex-col items-start p-4"
-                >
-                    <NavLink icon={<LayoutDashboard size={22} />} text="Dashboard" onClick={() => navigate('/dashboard')} />
-                    <NavLink icon={<User size={22} />} text="Profile" />
-                    <NavLink icon={<Settings size={22} />} text="Settings" isLast={true}/>
-                </motion.div>
-
-                {/* Chiqish tugmasi */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: "easeInOut", delay: 0.8 }}
-                    className="p-4"
-                >
-                    <Button
-                        variant="destructive"
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-3 p-6 text-lg h-auto bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20"
+            <AnimatePresence>
+                {isOpen && (
+                    <SheetContent 
+                        className="w-[300px] sm:w-[320px] bg-background/90 backdrop-blur-lg border-l-primary/10 p-0 flex flex-col"
                     >
-                        <LogOut size={22} />
-                        <span>Log Out</span>
-                    </Button>
-                </motion.div>
-            </SheetContent>
+                        <motion.div
+                            variants={sheetVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            className="h-full flex flex-col"
+                        >
+                            <SheetHeader className="p-4 border-b border-border">
+                                <SheetTitle className="text-xl font-semibold text-center text-foreground">
+                                    Profile Menu
+                                </SheetTitle>
+                            </SheetHeader>
+                            
+                            <div className="p-6 flex flex-col items-center gap-3">
+                                <Avatar className="h-20 w-20 border-2 border-primary/20">
+                                    <AvatarImage src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${user?.username}`} alt={user?.username} />
+                                    <AvatarFallback className="text-3xl">{userInitial}</AvatarFallback>
+                                </Avatar>
+                                <div className="text-center">
+                                    <p className="text-md font-semibold text-foreground">{user?.username}</p>
+                                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                                </div>
+                            </div>
+
+                            <Separator />
+                            
+                            <div className="flex-grow flex flex-col p-3">
+                                <NavLink icon={<LayoutDashboard size={18} />} text="Dashboard" onClick={() => { navigate('/dashboard'); setIsOpen(false); }} />
+                                <NavLink icon={<User size={18} />} text="Profile" onClick={() => setIsOpen(false)} />
+                                <NavLink icon={<Settings size={18} />} text="Settings" onClick={() => setIsOpen(false)} />
+                            </div>
+
+                            <div className="p-3 mt-auto">
+                               <Separator className="mb-3"/>
+                                <Button
+                                    variant="ghost"
+                                    onClick={handleLogout}
+                                    className="w-full flex items-center justify-start gap-3 p-3 text-base h-auto text-red-500 hover:bg-red-500/10 hover:text-red-500"
+                                >
+                                    <LogOut size={18} />
+                                    <span>Log Out</span>
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </SheetContent>
+                )}
+            </AnimatePresence>
         </Sheet>
     );
 };

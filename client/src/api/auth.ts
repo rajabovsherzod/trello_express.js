@@ -1,19 +1,18 @@
-import { type LoginFormValues, type RegisterFormValues } from "@/lib/validations";
-import { $axios } from "./axios";
-import { type UserResponse } from "@/types";
+import { $axios, $api } from "./axios";
+import type { LoginFormValues, RegisterFormValues } from "@/lib/validations";
+import type { UserResponse } from "@/types";
 
-
-export const registerUser =  async (userData: RegisterFormValues): Promise<UserResponse> => {
-    const { data } = await $axios.post('/users', userData)
-    return data
-}
-
-export const loginUser = async (userData: LoginFormValues): Promise<UserResponse> => {
-    const { data } = await $axios.post('/users/login', userData)
-    return data
-}
-
-export const refreshToken = async (): Promise<UserResponse> => {
-    const { data } = await $axios.get('/users/refresh');
+export const registerUser = async (values: RegisterFormValues): Promise<UserResponse> => {
+    const { data } = await $axios.post<UserResponse>('/users/register', values);
     return data;
-}
+};
+
+export const loginUser = async (values: LoginFormValues): Promise<UserResponse> => {
+    const { data } = await $axios.post<UserResponse>('/users/login', values);
+    return data;
+};
+
+export const refreshToken = async (token: string): Promise<UserResponse> => {
+    const { data } = await $axios.post<UserResponse>('/users/refresh', { refreshToken: token });
+    return data;
+};

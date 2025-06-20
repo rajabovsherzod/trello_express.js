@@ -12,9 +12,9 @@ export const generateTokens = async (payload) => {
 
 export const saveRefreshToken = async (userId, refreshToken) => {
     const tokenData = await TokenModel.findOneAndUpdate(
-        {userId: userId},
-        {token: refreshToken},
-        {new: true, upsert: true}
+        { userId: userId },
+        { token: refreshToken },
+        { new: true, upsert: true }
     )
     return tokenData
 }

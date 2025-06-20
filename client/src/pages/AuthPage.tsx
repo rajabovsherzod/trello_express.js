@@ -16,13 +16,13 @@ import { useNavigate } from "react-router-dom";
 const AuthPage = () => {
   const [mode, setMode] = useState<"login" | "register">("login");
   const navigate = useNavigate()
-  const { setUser } = userAuthStore()
+  const setUserAndTokens = userAuthStore((state) => state.setUserAndTokens);
 
   const {mutate: register, isPending: registerPending} = useMutation({
     mutationKey: ["register"],
     mutationFn: registerUser,
     onSuccess: (data) => {
-      setUser(data.user, data.accessToken)
+      setUserAndTokens(data.user, data.accessToken, data.refreshToken) 
       navigate('/dashboard');
       toast.success("You have successfully registered")
     },
@@ -37,7 +37,7 @@ const AuthPage = () => {
     mutationKey: ["login"],
     mutationFn: loginUser,
     onSuccess: (data) => {
-      setUser(data.user, data.accessToken)
+      setUserAndTokens(data.user, data.accessToken, data.refreshToken)
       navigate('/dashboard');
       toast.success("You have successfully logged in")
     },

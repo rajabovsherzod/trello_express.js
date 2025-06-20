@@ -7,10 +7,10 @@ import { registerValidation, loginValidation } from '../../middlewares/validatio
 
 const router = Router()
 const userController = new UserController(userService)
-router.post('/', registerValidation, userController.register)
+router.post('/register', registerValidation, userController.register)
 router.post('/login', loginValidation, userController.login)
 router.get('/me', authMiddleware, userController.getMe)
 router.post('/logout', userController.logout)
-router.get('/refresh', userController.refresh)
+router.post('/refresh', userController.refresh)
 
 export default router

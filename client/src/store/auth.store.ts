@@ -1,43 +1,57 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { IUser } from "@/types";
 
-interface IUser {
-    id: string;
-    email: string;
-    username: string;
+// Brauzerda xavfsiz tarzda tokenlarni olish uchun yordamchi funksiyalar
+const getInitialToken = (key: string) => {
+    if (typeof window !== 'undefined') {
+        return localStorage.getItem(key);
+    }
+    return null;
 }
 
 interface AuthStore {
-    user: IUser | null
-    accessToken: string | null
-    isAuthenticated: boolean
-    setUser: (user: IUser, accessToken: string) => void
-    logout: () => void
+    user: IUser | null;
+    accessToken: string | null;
+    refreshToken: string | null;
+    isAuthenticated: boolean;
+    setUserAndTokens: (user: IUser, accessToken: string, refreshToken: string) => void;
+    logout: () => void;
 }
+
+const initialAccessToken = getInitialToken('accessToken');
+const initialRefreshToken = getInitialToken('refreshToken');
 
 export const userAuthStore = create<AuthStore>()(
     persist(
         (set) => ({
             user: null,
-            accessToken: null,
-            isAuthenticated: false,
-            setUser: (user, accessToken) => set({
-                user,
-                accessToken,
-                isAuthenticated: true
-            }),
-            logout: () => set({
-                user: null,
-                accessToken: null,
-                isAuthenticated: false
-            })
+            accessToken: initialAccessToken,
+            refreshToken: initialRefreshToken,
+            isAuthenticated: !!initialAccessToken,
+            setUserAndTokens: (user, accessToken, refreshToken) => {
+                localStorage.setItem('accessToken', accessToken);
+                localStorage.setItem('refreshToken', refreshToken);
+                set({
+                    user,
+                    accessToken,
+                    refreshToken,
+                    isAuthenticated: true,
+                });
+            },
+            logout: () => {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                set({
+                    user: null,
+                    accessToken: null,
+                    refreshToken: null,
+                    isAuthenticated: false,
+                });
+            },
         }),
         {
             name: 'auth-storage',
-            partialize: (state) => ({
-                user: state.user,
-                isAuthenticated: state.isAuthenticated
-            })
         }
     )
-)
+);

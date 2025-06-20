@@ -66,13 +66,17 @@ class UserController {
 
     refresh = async (req, res, next) => {
         try {
-            const { refreshToken } = req.cookies
+            const { refreshToken } = req.body
+            if (!refreshToken) {
+                return next(new ApiError(401, 'Refresh token not provided'));
+            }
             const userData = await this.userService.refresh(refreshToken)
             res.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict'})
             res.status(200).json({
                 message: 'Refresh was successfull',
                 accessToken: userData.accessToken,
-                user: userData.user
+                user: userData.user,
+                refreshToken: userData.refreshToken
             })
         } catch (error) {
             next(error)

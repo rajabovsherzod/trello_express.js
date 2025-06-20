@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Eye, Lock } from 'lucide-react';
+import { X, Eye, Lock, LoaderCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { useMutation } from '@tanstack/react-query';
 
 import { useBoardsStore } from '@/store/boards-store';
 import { createBoard } from '@/api/board-create';
@@ -21,7 +22,7 @@ const boardColors = [
 ];
 const boardImages = [
     'https://images.unsplash.com/photo-1522252234503-e356532cafd5?q=80&w=2070&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1507525428034-b723a9ce6890?q=80&w=2070&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1554147090-e1221a04a025?q=80&w=2070&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=80&w=2070&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=1887&auto=format&fit=crop',
 ];
@@ -32,7 +33,7 @@ interface BoardCreateModalProps {
 }
 
 export const BoardCreateModal: React.FC<BoardCreateModalProps> = ({ isOpen, onClose }) => {
-    const addBoard = useBoardsStore(s => s.addBoard);
+    const addBoard = useBoardsStore((state) => state.addBoard);
 
     const form = useForm<BoardCreateValues>({
         resolver: zodResolver(boardCreateSchema),
@@ -46,22 +47,26 @@ export const BoardCreateModal: React.FC<BoardCreateModalProps> = ({ isOpen, onCl
 
     const watchedName = form.watch('name');
     const watchedBackground = form.watch('background');
-    const { isSubmitting } = form.formState;
-
-    const onSubmit = async (values: BoardCreateValues) => {
-        try {
-            const newBoard = await createBoard(values);
-            addBoard(newBoard);
+    
+    const { mutate: createBoardMutation, isPending } = useMutation({
+        mutationFn: createBoard,
+        onSuccess: (newBoard) => {
             toast.success(`Board "${newBoard.name}" created successfully!`);
+            addBoard(newBoard);
             onClose();
             form.reset();
-        } catch (error: any) {
+        },
+        onError: (error: any) => {
             toast.error(error.message || 'Failed to create board.');
         }
+    });
+
+    const onSubmit = (values: BoardCreateValues) => {
+        createBoardMutation(values);
     };
 
     const handleClose = () => {
-        if (isSubmitting) return;
+        if (isPending) return;
         onClose();
         setTimeout(() => form.reset(), 200);
     }
@@ -195,16 +200,23 @@ export const BoardCreateModal: React.FC<BoardCreateModalProps> = ({ isOpen, onCl
                                     <div className="pt-4 flex justify-center">
                                         <Button 
                                             type="submit" 
-                                            disabled={isSubmitting}
-                                            className="px-12 py-2 rounded-md bg-[linear-gradient(110deg,hsl(var(--primary)),hsl(var(--accent)))] text-white font-semibold transition-colors"
+                                            disabled={isPending}
+                                            className="px-12 py-2 rounded-md bg-[linear-gradient(110deg,hsl(var(--primary)),hsl(var(--accent)))] text-white font-semibold transition-colors flex items-center justify-center gap-2"
                                         >
-                                            {isSubmitting ? 'Creating...' : 'Create'}
+                                            {isPending ? (
+                                                <>
+                                                    <LoaderCircle size={18} className="animate-spin" /> 
+                                                    <span>Creating...</span>
+                                                </>
+                                            ) : (
+                                                'Create'
+                                            )}
                                         </Button>
                                     </div>
                                 </form>
                             </div>
                         </Form>
-                         <button onClick={handleClose} disabled={isSubmitting} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors p-1 rounded-full hover:bg-muted disabled:opacity-50">
+                         <button onClick={handleClose} disabled={isPending} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors p-1 rounded-full hover:bg-muted disabled:opacity-50">
                             <X size={20} />
                         </button>
                     </motion.div>

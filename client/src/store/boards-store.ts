@@ -45,7 +45,7 @@ export const useBoardsStore = create<BoardsStore>()(
       // Board CRUD
       addBoard: (board) =>
         set((state) => ({
-          boards: [...state.boards, board],
+          boards: [board, ...state.boards],
         })),
       updateBoard: (id, board) =>
         set((state) => ({

@@ -12,7 +12,8 @@ class BoardService {
             members: [userId]
         };
         const newBoard = await BoardModel.create(boardPayload);
-        return newBoard;
+        const populatedBoard = await BoardModel.findById(newBoard._id).populate('owner', 'username email').lean();
+        return populatedBoard;
     }
 
     async getBoardsForUser(userId, queryOptions = {}){
@@ -26,7 +27,7 @@ class BoardService {
         const skip = (page - 1) * limit
 
         const [boards, totalBoards] = await Promise.all([
-            BoardModel.find({members: userId}).sort({createdAt: -1}).skip(skip).limit(limit),
+            BoardModel.find({members: userId}).populate('owner', 'username email').sort({createdAt: -1}).skip(skip).limit(limit),
             BoardModel.countDocuments({members: userId})
         ])
 

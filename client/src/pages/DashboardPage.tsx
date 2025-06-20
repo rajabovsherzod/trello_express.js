@@ -15,7 +15,7 @@ const DashboardPage = () => {
   }, [fetchBoards]);
 
   return (
-    <div className="pt-24">
+    <div className="pt-[4.5rem]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <DashboardHeader />
 

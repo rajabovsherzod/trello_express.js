@@ -14,7 +14,10 @@ export const DashboardHeader = () => {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-foreground">
-                            Welcome back, <span className="text-primary">{username}</span>
+                            Welcome back,{' '}
+                            <span className="inline-block animate-shimmer bg-[linear-gradient(110deg,hsl(var(--primary)),45%,hsl(var(--accent)),55%,hsl(var(--primary)))] bg-[length:200%_100%] bg-clip-text text-transparent">
+                                {username}
+                            </span>
                         </h1>
                         <TextGenerateEffect
                             words="Here are your boards. Ready to get things done?"
@@ -23,7 +26,7 @@ export const DashboardHeader = () => {
                     </div>
                     <Button 
                         onClick={() => setIsModalOpen(true)}
-                        className="bg-primary/90 hover:bg-primary text-primary-foreground font-semibold py-3 px-5 rounded-lg transition-all duration-300 shadow-md hover:shadow-primary/40 transform hover:-translate-y-1 active:translate-y-0"
+                        className="px-6 py-2 rounded-md bg-[linear-gradient(110deg,hsl(var(--primary)),45%,hsl(var(--accent)),55%,hsl(var(--primary)))] bg-[length:200%_100%] text-white font-semibold transition-colors"
                     >
                         + Create New Board
                     </Button>

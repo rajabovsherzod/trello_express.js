@@ -4,9 +4,8 @@ import { X, Eye, Lock, LoaderCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { useBoardsStore } from '@/store/boards-store';
 import { createBoard } from '@/api/board-create';
 import { boardCreateSchema } from '@/lib/board-create-validation';
 import type { BoardCreateValues } from '@/lib/board-create-validation';
@@ -33,7 +32,7 @@ interface BoardCreateModalProps {
 }
 
 export const BoardCreateModal: React.FC<BoardCreateModalProps> = ({ isOpen, onClose }) => {
-    const addBoard = useBoardsStore((state) => state.addBoard);
+    const queryClient = useQueryClient();
 
     const form = useForm<BoardCreateValues>({
         resolver: zodResolver(boardCreateSchema),
@@ -52,7 +51,7 @@ export const BoardCreateModal: React.FC<BoardCreateModalProps> = ({ isOpen, onCl
         mutationFn: createBoard,
         onSuccess: (newBoard) => {
             toast.success(`Board "${newBoard.name}" created successfully!`);
-            addBoard(newBoard);
+            queryClient.invalidateQueries({ queryKey: ['boards-list'] });
             onClose();
             form.reset();
         },

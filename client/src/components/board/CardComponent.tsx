@@ -2,6 +2,7 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
+import type { Card as CardType } from '@/types';
 
 export interface Card {
   id: string;
@@ -9,7 +10,7 @@ export interface Card {
 }
 
 interface CardComponentProps {
-  card: Card;
+  card: CardType;
   isOverlay?: boolean;
 }
 
@@ -22,7 +23,7 @@ const CardComponent: React.FC<CardComponentProps> = ({ card, isOverlay }) => {
     transition,
     isDragging,
   } = useSortable({
-    id: card.id,
+    id: card._id,
     data: {
       type: 'Card',
       item: card,
@@ -32,7 +33,6 @@ const CardComponent: React.FC<CardComponentProps> = ({ card, isOverlay }) => {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    touchAction: 'none',
   };
 
   // Sudralayotgan elementning asl joyida qoladigan bo'shliq
@@ -52,16 +52,12 @@ const CardComponent: React.FC<CardComponentProps> = ({ card, isOverlay }) => {
       {...attributes}
       {...listeners}
       className={cn(
-        'p-4 h-[60px] flex items-center rounded-xl border relative',
-        'bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg',
-        'hover:border-cyan-400/60 transition-colors duration-300',
-        'cursor-grab active:cursor-grabbing select-none',
-        isOverlay
-          ? 'border-cyan-400 shadow-cyan-500/30 shadow-2xl'
-          : 'border-white/20'
+        "p-4 rounded-xl border bg-neutral-900/80 border-neutral-700/60 cursor-grab active:cursor-grabbing",
+        isDragging && "opacity-50 ring-2 ring-rose-500",
+        isOverlay && "ring-2 ring-rose-500 shadow-xl"
       )}
     >
-      <p className="text-sm font-medium text-neutral-100">{card.title}</p>
+      <p className="text-sm font-medium text-neutral-200">{card.name}</p>
       
       {/* Hover Glow Effect */}
       <div className="absolute -inset-px rounded-xl bg-gradient-to-r from-cyan-500/50 to-teal-500/50 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />

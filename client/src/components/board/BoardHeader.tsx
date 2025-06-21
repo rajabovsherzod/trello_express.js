@@ -1,5 +1,6 @@
 import React from 'react';
-import { Star, Users, MoreHorizontal, Filter } from 'lucide-react';
+import { Star, Users, MoreHorizontal, Filter, Home } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -9,12 +10,10 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useSidebar } from '@/components/ui/sidebar';
+import type { Board } from '@/types';
 
 interface BoardHeaderProps {
-  board: {
-    title: string;
-    members: { id: string; name: string; avatar: string }[];
-  };
+  board: Partial<Board>;
 }
 
 const BoardHeader: React.FC<BoardHeaderProps> = ({ board }) => {
@@ -23,7 +22,20 @@ const BoardHeader: React.FC<BoardHeaderProps> = ({ board }) => {
   return (
     <header className="flex h-14 flex-shrink-0 items-center justify-between bg-gradient-to-b from-black/50 to-black/10 px-4 md:h-16 md:px-6 backdrop-blur-lg">
       <div className="flex items-center gap-2 md:gap-4">
-        <h1 className="text-lg md:text-xl font-bold text-foreground truncate">{board.title}</h1>
+        <TooltipProvider delayDuration={0}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Link to="/dashboard">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground transition-colors hover:bg-white/10 hover:text-white">
+                            <Home className="h-5 w-5" />
+                        </Button>
+                    </Link>
+                </TooltipTrigger>
+                <TooltipContent><p>Back to Dashboard</p></TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+
+        <h1 className="text-lg md:text-xl font-bold text-foreground truncate">{board.name || 'Board'}</h1>
         <div className="hidden md:flex items-center gap-2">
           <TooltipProvider delayDuration={0}>
             <Tooltip>
@@ -37,19 +49,19 @@ const BoardHeader: React.FC<BoardHeaderProps> = ({ board }) => {
           </TooltipProvider>
 
           <div className="flex -space-x-2 overflow-hidden">
-            <TooltipProvider delayDuration={0}>
-              {board.members.map((member) => (
-                <Tooltip key={member.id}>
-                  <TooltipTrigger asChild>
-                    <Avatar className="h-8 w-8 border-2 border-black/50 transition-transform hover:scale-110">
-                      <AvatarImage src={member.avatar} />
-                      <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                  </TooltipTrigger>
-                  <TooltipContent><p>{member.name}</p></TooltipContent>
-                </Tooltip>
-              ))}
-            </TooltipProvider>
+            {board.owner && (
+               <TooltipProvider delayDuration={0}>
+                 <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Avatar className="h-8 w-8 border-2 border-black/50 transition-transform hover:scale-110">
+                        <AvatarImage src={`https://i.pravatar.cc/40?u=${board.owner._id}`} />
+                        <AvatarFallback>{board.owner.username?.charAt(0).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                    </TooltipTrigger>
+                    <TooltipContent><p>{board.owner.username} (Owner)</p></TooltipContent>
+                  </Tooltip>
+               </TooltipProvider>
+            )}
           </div>
         </div>
       </div>
@@ -73,4 +85,4 @@ const BoardHeader: React.FC<BoardHeaderProps> = ({ board }) => {
   );
 };
 
-export default BoardHeader; 
+export default BoardHeader;

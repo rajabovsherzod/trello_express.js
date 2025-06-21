@@ -10,7 +10,7 @@ export interface Card {
 
 interface CardComponentProps {
   card: Card;
-  isOverlay?: boolean; // Overlay uchun maxsus stil
+  isOverlay?: boolean;
 }
 
 const CardComponent: React.FC<CardComponentProps> = ({ card, isOverlay }) => {
@@ -32,6 +32,7 @@ const CardComponent: React.FC<CardComponentProps> = ({ card, isOverlay }) => {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    touchAction: 'none',
   };
 
   // Sudralayotgan elementning asl joyida qoladigan bo'shliq
@@ -39,7 +40,7 @@ const CardComponent: React.FC<CardComponentProps> = ({ card, isOverlay }) => {
     return (
       <div
         ref={setNodeRef}
-        className="h-[56px] rounded-lg bg-white/5 border-2 border-dashed border-white/10"
+        className="h-[60px] rounded-xl bg-white/10 border-2 border-dashed border-white/20"
       />
     );
   }
@@ -51,12 +52,19 @@ const CardComponent: React.FC<CardComponentProps> = ({ card, isOverlay }) => {
       {...attributes}
       {...listeners}
       className={cn(
-        'p-4 h-[56px] flex items-center rounded-lg border bg-black/20 backdrop-blur-sm shadow-md cursor-grab active:cursor-grabbing select-none',
-        isOverlay ? 'border-cyan-400' : 'border-white/20 hover:border-white/40',
-        'transition-colors duration-200'
+        'p-4 h-[60px] flex items-center rounded-xl border relative',
+        'bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg',
+        'hover:border-cyan-400/60 transition-colors duration-300',
+        'cursor-grab active:cursor-grabbing select-none',
+        isOverlay
+          ? 'border-cyan-400 shadow-cyan-500/30 shadow-2xl'
+          : 'border-white/20'
       )}
     >
       <p className="text-sm font-medium text-neutral-100">{card.title}</p>
+      
+      {/* Hover Glow Effect */}
+      <div className="absolute -inset-px rounded-xl bg-gradient-to-r from-cyan-500/50 to-teal-500/50 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
     </div>
   );
 };

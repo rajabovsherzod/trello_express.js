@@ -1,13 +1,7 @@
 import React from 'react';
-import {
-  Sidebar,
-  SidebarContent,
-} from "@/components/ui/sidebar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Info, Image, Activity, X, Settings, User, Edit2 } from 'lucide-react';
-import { useSidebar } from '@/components/ui/sidebar';
+import { Info, Image, Activity, Settings, User, Edit2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
@@ -59,32 +53,28 @@ const SectionCard = ({ children, className }: { children: React.ReactNode, class
 );
 
 const BoardMenu: React.FC<BoardMenuProps> = ({ board, setPreviewBackground }) => {
-    const { setOpen } = useSidebar();
-
     const handleBgHover = (bg: string | null) => {
         setPreviewBackground(bg);
     };
 
     return (
-        <Sidebar side="right" collapsible="offcanvas" className="bg-neutral-950/80 border-l-cyan-500/20 text-neutral-200 backdrop-blur-xl p-0 flex flex-col">
-            <div className="flex items-center justify-between p-3 border-b border-cyan-500/10 flex-shrink-0">
+        <div className="flex flex-col h-full">
+            <div className="flex items-center justify-between p-4 border-b border-cyan-500/20 flex-shrink-0">
                 <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-cyan-300 to-teal-200">Board Center</h2>
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-white/10" onClick={() => setOpen(false)}>
-                    <X size={20} />
-                </Button>
+                {/* X tugmasi olib tashlandi */}
             </div>
-            <SidebarContent className="p-0 flex-grow">
+            <div className="flex-grow overflow-y-auto">
                 <Tabs defaultValue="details" className="h-full w-full flex flex-col">
-                    <TabsList className="grid w-full grid-cols-4 bg-transparent p-2 rounded-none flex-shrink-0">
+                    <TabsList className="grid w-full grid-cols-4 bg-transparent p-2 rounded-none flex-shrink-0 border-b border-cyan-500/20">
                         <TabsTrigger value="details"><Info className="w-5 h-5"/></TabsTrigger>
                         <TabsTrigger value="design"><Image className="w-5 h-5"/></TabsTrigger>
                         <TabsTrigger value="activity"><Activity className="w-5 h-5"/></TabsTrigger>
                         <TabsTrigger value="settings"><Settings className="w-5 h-5"/></TabsTrigger>
                     </TabsList>
                     
-                    <div className="flex-grow overflow-y-auto p-3">
+                    <div className="flex-grow overflow-y-auto p-4">
                       <AnimatePresence mode="wait">
-                          <TabsContent value="details" className="space-y-4">
+                          <TabsContent value="details" className="space-y-4 mt-0">
                               <SectionCard>
                                   <CardHeader><CardTitle className="flex items-center gap-2 text-base text-cyan-300"><Edit2 size={16}/> Board Title</CardTitle></CardHeader>
                                   <CardContent><Input className="bg-neutral-950" defaultValue={boardData.title} /></CardContent>
@@ -100,7 +90,7 @@ const BoardMenu: React.FC<BoardMenuProps> = ({ board, setPreviewBackground }) =>
                                   </CardContent>
                               </SectionCard>
                           </TabsContent>
-                          <TabsContent value="design" className="space-y-4">
+                          <TabsContent value="design" className="space-y-4 mt-0">
                               <SectionCard>
                                   <CardHeader><CardTitle className="text-base text-cyan-300">Colors</CardTitle></CardHeader>
                                   <CardContent className="grid grid-cols-4 gap-2">
@@ -114,7 +104,7 @@ const BoardMenu: React.FC<BoardMenuProps> = ({ board, setPreviewBackground }) =>
                                   </CardContent>
                               </SectionCard>
                           </TabsContent>
-                          <TabsContent value="activity" className="space-y-4">
+                          <TabsContent value="activity" className="space-y-4 mt-0">
                               <SectionCard>
                                   <CardHeader><CardTitle className="text-base text-cyan-300">Activity Log</CardTitle></CardHeader>
                                   <CardContent>
@@ -134,7 +124,7 @@ const BoardMenu: React.FC<BoardMenuProps> = ({ board, setPreviewBackground }) =>
                                   </CardContent>
                               </SectionCard>
                           </TabsContent>
-                          <TabsContent value="settings" className="space-y-4">
+                          <TabsContent value="settings" className="space-y-4 mt-0">
                               <SectionCard>
                                   <CardHeader><CardTitle className="text-base text-cyan-300">Power-Ups</CardTitle></CardHeader>
                                   <CardContent><p className="text-sm text-neutral-400">No active Power-Ups.</p></CardContent>
@@ -143,8 +133,8 @@ const BoardMenu: React.FC<BoardMenuProps> = ({ board, setPreviewBackground }) =>
                       </AnimatePresence>
                     </div>
                 </Tabs>
-            </SidebarContent>
-        </Sidebar>
+            </div>
+        </div>
     );
 };
 

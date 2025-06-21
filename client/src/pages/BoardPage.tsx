@@ -1,20 +1,17 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { motion, useMotionValue } from 'framer-motion';
+import React, { useState, useCallback, useMemo } from 'react';
 import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, closestCorners } from '@dnd-kit/core';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, arrayMove, horizontalListSortingStrategy, verticalListSortingStrategy } from '@dnd-kit/sortable';
-
+import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import BoardHeader from '@/components/board/BoardHeader';
-import { SidebarProvider, SidebarInset, useSidebar } from '@/components/ui/sidebar';
+import { SidebarProvider, Sidebar } from '@/components/ui/sidebar';
 import BoardMenu from '@/components/board/BoardMenu';
-import { useMediaQuery } from '@/hooks/use-media-query';
 import ListComponent from '@/components/board/ListComponent';
 import CardComponent from '@/components/board/CardComponent';
 import type { List } from '@/components/board/ListComponent';
 import type { Card } from '@/components/board/CardComponent';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
-
-// Mock ma'lumotlar. Backend keyin ulanadi.
+// Mock Data...
 const mockBoard = {
   id: 'board-1',
   title: 'WOOOOOOW Project Board',
@@ -32,23 +29,17 @@ const mockBoard = {
   ]
 };
 
-
-const BoardPageContent = () => {
+const BoardPage = () => {
   const [boardData, setBoardData] = useState(mockBoard);
   const [activeList, setActiveList] = useState<List | null>(null);
   const [activeCard, setActiveCard] = useState<Card | null>(null);
   const [previewBackground, setPreviewBackground] = useState<string | null>(null);
+  
+  const isTablet = useMediaQuery("(max-width: 1024px)");
 
   const listIds = useMemo(() => boardData.lists.map(l => l.id), [boardData.lists]);
-  
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
-  
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
+
   const findContainer = useCallback((id: string) => {
     if (listIds.includes(id)) return id;
     return boardData.lists.find((list) => list.cards.some((card) => card.id === id))?.id;
@@ -62,16 +53,14 @@ const BoardPageContent = () => {
       setActiveCard(active.data.current.item);
     }
   }, []);
-
+  
   const onDragEnd = useCallback((event: DragEndEvent) => {
     setActiveList(null);
     setActiveCard(null);
     const { active, over } = event;
     if (!over) return;
-
-    const activeId = active.id;
-    const overId = over.id;
-
+    const { id: activeId } = active;
+    const { id: overId } = over;
     if (activeId === overId) return;
 
     const isActiveAList = active.data.current?.type === 'List';
@@ -89,16 +78,17 @@ const BoardPageContent = () => {
       setBoardData((board) => {
         const activeContainerId = findContainer(activeId as string);
         const overContainerId = findContainer(overId as string);
-
         if (!activeContainerId || !overContainerId) return board;
 
         const activeListIndex = board.lists.findIndex(l => l.id === activeContainerId);
         const overListIndex = board.lists.findIndex(l => l.id === overContainerId);
+        if (activeListIndex === -1 || overListIndex === -1) return board;
 
         if (activeContainerId === overContainerId) {
           const list = board.lists[activeListIndex];
           const oldIndex = list.cards.findIndex(c => c.id === activeId);
           const newIndex = list.cards.findIndex(c => c.id === overId);
+          if (oldIndex === -1 || newIndex === -1) return board;
           const newCards = arrayMove(list.cards, oldIndex, newIndex);
           const newLists = [...board.lists];
           newLists[activeListIndex] = { ...list, cards: newCards };
@@ -110,12 +100,9 @@ const BoardPageContent = () => {
           if (!cardToMove) return board;
           const newActiveCards = activeList.cards.filter(c => c.id !== activeId);
           const isOverACard = over.data.current?.type === 'Card';
-          const overCardIndex = isOverACard 
-            ? overList.cards.findIndex(c => c.id === overId) 
-            : overList.cards.length;
+          const overCardIndex = isOverACard ? overList.cards.findIndex(c => c.id === overId) : overList.cards.length;
           const newOverCards = [...overList.cards];
           newOverCards.splice(overCardIndex, 0, cardToMove);
-
           const newLists = board.lists.map(list => {
             if (list.id === activeContainerId) return { ...list, cards: newActiveCards };
             if (list.id === overContainerId) return { ...list, cards: newOverCards };
@@ -134,42 +121,7 @@ const BoardPageContent = () => {
       : { backgroundColor: previewBackground || boardData.background }
     ),
   };
-
-  return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-    >
-      <div className="h-screen w-full bg-cover bg-center" style={backgroundStyle}>
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="relative flex h-full w-full flex-col">
-          <BoardHeader board={boardData} />
-          <SidebarInset className="flex-grow overflow-hidden p-4">
-            <div className="h-full w-full overflow-x-auto">
-                <div className="inline-flex h-full items-start gap-4">
-                  <SortableContext items={listIds} strategy={horizontalListSortingStrategy}>
-                    {boardData.lists.map((list) => <ListComponent key={list.id} list={list} />)}
-                  </SortableContext>
-                </div>
-            </div>
-          </SidebarInset>
-        </div>
-      </div>
-      <BoardMenu board={boardData} setPreviewBackground={setPreviewBackground} />
-      <DragOverlay>
-        {activeList ? <ListComponent list={activeList} isOverlay /> : null}
-        {activeCard ? <CardComponent card={activeCard} isOverlay /> : null}
-      </DragOverlay>
-    </DndContext>
-  );
-}
-
-const BoardPage = () => {
-  const isTablet = useMediaQuery("(max-width: 1024px)");
-  const isMobile = useMediaQuery("(max-width: 768px)");
-
+  
   const getSidebarWidth = () => {
     if (isTablet) return '380px';
     return '400px';
@@ -177,7 +129,37 @@ const BoardPage = () => {
 
   return (
     <SidebarProvider style={{ '--sidebar-width': getSidebarWidth() } as React.CSSProperties}>
-      <BoardPageContent />
+      <div className="flex h-screen w-full bg-cover bg-center" style={backgroundStyle}>
+        <div className="absolute inset-0 bg-black/40" />
+        
+        {/* Asosiy Kontent (Chap) */}
+        <div className="relative flex h-full flex-1 flex-col overflow-hidden md:mr-[var(--sidebar-width)]">
+          <BoardHeader board={boardData} />
+          <main className="flex-grow overflow-auto p-6">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCorners}
+              onDragStart={onDragStart}
+              onDragEnd={onDragEnd}
+            >
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                <SortableContext items={listIds} strategy={verticalListSortingStrategy}>
+                  {boardData.lists.map((list) => <ListComponent key={list.id} list={list} />)}
+                </SortableContext>
+              </div>
+              <DragOverlay>
+                {activeList ? <ListComponent list={activeList} isOverlay /> : null}
+                {activeCard ? <CardComponent card={activeCard} isOverlay /> : null}
+              </DragOverlay>
+            </DndContext>
+          </main>
+        </div>
+        
+        {/* Sidebar (O'ng) */}
+        <Sidebar side="right">
+            <BoardMenu board={boardData} setPreviewBackground={setPreviewBackground} />
+        </Sidebar>
+      </div>
     </SidebarProvider>
   );
 };

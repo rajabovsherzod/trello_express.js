@@ -1,10 +1,17 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { MoreHorizontal, Plus } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+
 import CardComponent from './CardComponent';
-import type { List as ListType, Card as CardType } from '@/types';
+import { AddCardForm } from './AddCardForm';
+import { createCard } from '@/api/card-create';
+
+import type { List as ListType, Card as CardType, Board } from '@/types';
 
 interface ListComponentProps {
   list: ListType;
@@ -12,6 +19,9 @@ interface ListComponentProps {
 }
 
 const ListComponent: React.FC<ListComponentProps> = ({ list, isOverlay }) => {
+  const [isAddingCard, setIsAddingCard] = useState(false);
+  const queryClient = useQueryClient();
+
   const {
     attributes,
     listeners,
@@ -21,18 +31,45 @@ const ListComponent: React.FC<ListComponentProps> = ({ list, isOverlay }) => {
     isDragging,
   } = useSortable({
     id: list._id,
-    data: {
-      type: 'List',
-      item: list,
+    data: { type: 'List', item: list },
+  });
+
+  const cardIds = useMemo(() => list.cards?.map((c: CardType) => c._id) ?? [], [list.cards]);
+
+  const { mutate: addCardMutation, isPending: isAdding } = useMutation({
+    mutationFn: createCard,
+    onSuccess: (newCard) => {
+      // Keshni optimistik tarzda yangilaymiz
+      const boardQueryKey = ['board', list.boardId];
+      queryClient.setQueryData<Board | undefined>(boardQueryKey, (oldBoardData) => {
+        if (!oldBoardData) return undefined;
+        const newLists = (oldBoardData.lists || []).map(l => 
+          l._id === list._id 
+            ? { ...l, cards: [...(l.cards || []), newCard] } 
+            : l
+        );
+        return { ...oldBoardData, lists: newLists };
+      });
+      toast.success(`Card "${newCard.name}" created!`);
+      // Muvaffaqiyatli yakunlangandan keyin formani yopamiz
+      setIsAddingCard(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to create card.");
     },
   });
+
+  const handleAddCard = (cardName: string) => {
+    addCardMutation({
+      listId: list._id,
+      name: cardName,
+    });
+  };
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
-
-  const cardIds = useMemo(() => list.cards?.map((c: CardType) => c._id) ?? [], [list.cards]);
 
   return (
     <div
@@ -69,11 +106,25 @@ const ListComponent: React.FC<ListComponentProps> = ({ list, isOverlay }) => {
         </SortableContext>
       </div>
 
-      <div className="p-3 border-t border-cyan-500/20">
-        <button className="flex w-full items-center gap-2 rounded-lg p-2 text-teal-200 hover:bg-cyan-400/10 hover:text-cyan-100 transition-colors duration-200">
-          <Plus size={18} />
-          <span className="font-medium text-sm">Add a card</span>
-        </button>
+      <div className="p-3 pt-2 border-t border-cyan-500/20">
+        <AnimatePresence>
+          {isAddingCard ? (
+            <AddCardForm 
+              listId={list._id}
+              onAddCard={handleAddCard}
+              isAdding={isAdding}
+              onClose={() => setIsAddingCard(false)}
+            />
+          ) : (
+            <motion.button
+              onClick={() => setIsAddingCard(true)}
+              className="flex w-full items-center gap-2 rounded-lg p-2 text-teal-200 hover:bg-cyan-400/10 hover:text-cyan-100 transition-colors duration-200"
+            >
+              <Plus size={18} />
+              <span className="font-medium text-sm">Add a card</span>
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

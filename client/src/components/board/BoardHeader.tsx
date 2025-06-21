@@ -20,7 +20,7 @@ const BoardHeader: React.FC<BoardHeaderProps> = ({ board }) => {
   const { toggleSidebar } = useSidebar();
   
   return (
-    <header className="flex h-14 flex-shrink-0 items-center justify-between bg-gradient-to-b from-black/50 to-black/10 px-4 md:h-16 md:px-6 backdrop-blur-lg">
+    <header className="hidden lg:flex h-14 flex-shrink-0 items-center justify-between bg-gradient-to-b from-black/50 to-black/10 px-4 md:h-16 md:px-6 backdrop-blur-lg">
       <div className="flex items-center gap-2 md:gap-4">
         <TooltipProvider delayDuration={0}>
             <Tooltip>

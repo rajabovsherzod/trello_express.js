@@ -12,6 +12,7 @@ import { getBoardById } from '@/api/get-board';
 import { createList } from '@/api/list-create';
 
 import BoardHeader from '@/components/board/BoardHeader';
+import MobileBoardHeader from '@/components/board/MobileBoardHeader';
 import BoardMenu from '@/components/board/BoardMenu';
 import ListComponent from '@/components/board/ListComponent';
 import CardComponent from '@/components/board/CardComponent';
@@ -102,10 +103,20 @@ const BoardPage = () => {
       >
         <div className="absolute inset-0 bg-black/40" />
         <div className="relative flex h-full flex-1 flex-col overflow-hidden md:mr-[var(--sidebar-width)]">
+          
           <BoardHeader board={boardData} />
-          <main className="flex-grow overflow-x-auto p-6">
+          <MobileBoardHeader board={boardData} />
+
+          {/* Yangi "Sahifa Sarlavhasi" bloki, faqat mobil/planshet uchun */}
+          <div className="lg:hidden p-4 pt-2">
+              <h1 className="text-xl font-bold text-white [text-shadow:_0_1px_4px_rgb(0_0_0_/_50%)]">
+                {boardData.name}
+              </h1>
+          </div>
+
+          <main className="flex-grow overflow-y-auto px-4 pb-4">
             <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:flex lg:h-full lg:items-start">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:h-full lg:items-start gap-6">
                 
                 {(boardData.lists && boardData.lists.length > 0) ? (
                   <SortableContext items={listIds}>
@@ -113,7 +124,7 @@ const BoardPage = () => {
                   </SortableContext>
                 ) : (
                   !isAddingList && (
-                    <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-500 p-12 text-center w-full lg:w-96">
+                    <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-500 p-12 text-center w-full lg:w-96 bg-black/10">
                         <h3 className="text-xl font-semibold text-white">No lists yet!</h3>
                         <p className="mt-2 text-sm text-gray-400">
                             This board is empty. Create the first list to start organizing your tasks.
@@ -122,7 +133,7 @@ const BoardPage = () => {
                   )
                 )}
 
-                <div className='flex-shrink-0 w-full md:w-72'>
+                <div className='flex-shrink-0 w-full lg:w-72'>
                   {isAddingList ? (
                     <AddListForm onAdd={handleAddList} onClose={() => setIsAddingList(false)} isSubmitting={isCreatingList} />
                   ) : (
@@ -135,7 +146,7 @@ const BoardPage = () => {
               </div>
               <DragOverlay>
                 {activeList ? <ListComponent list={activeList} isOverlay /> : null}
-                {activeCard ? <CardComponent card={activeCard} isOverlay /> : null}
+                {activeCard ? <CardComponent card={card} isOverlay /> : null}
               </DragOverlay>
             </DndContext>
           </main>

@@ -47,7 +47,7 @@ const ListComponent: React.FC<ListComponentProps> = ({ list, isOverlay }) => {
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex w-72 max-h-full flex-shrink-0 flex-col rounded-2xl overflow-hidden',
+        'flex w-full max-h-full flex-shrink-0 flex-col rounded-2xl overflow-hidden',
         'border border-cyan-500/20 bg-teal-950/70 backdrop-blur-2xl shadow-2xl',
         isDragging && 'opacity-40',
         isOverlay && 'ring-2 ring-cyan-400'

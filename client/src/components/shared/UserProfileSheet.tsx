@@ -36,14 +36,14 @@ const ConditionalTrigger = React.forwardRef<HTMLButtonElement>((props, ref) => {
                 <Menu className="h-6 w-6" />
             </Button>
         );
-    }
+  }
 
-    return (
+  return (
         <Button {...props} ref={ref} variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar className="h-10 w-10 border-2 border-transparent hover:border-primary transition-colors duration-300">
                 <AvatarImage src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${user?.username}`} alt={user?.username} />
                 <AvatarFallback>{userInitial}</AvatarFallback>
-            </Avatar>
+          </Avatar>
         </Button>
     );
 });
@@ -74,7 +74,7 @@ export const UserProfileSheet = () => {
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
                 <ConditionalTrigger />
-            </SheetTrigger>
+      </SheetTrigger>
             <AnimatePresence>
                 {isOpen && (
                     <SheetContent 
@@ -91,7 +91,7 @@ export const UserProfileSheet = () => {
                                 <SheetTitle className="text-xl font-semibold text-center text-foreground">
                                     Profile Menu
                                 </SheetTitle>
-                            </SheetHeader>
+        </SheetHeader>
                             
                             <div className="p-6 flex flex-col items-center gap-3">
                                 <Avatar className="h-20 w-20 border-2 border-primary/20">
@@ -101,8 +101,8 @@ export const UserProfileSheet = () => {
                                 <div className="text-center">
                                     <p className="text-md font-semibold text-foreground">{user?.username}</p>
                                     <p className="text-xs text-muted-foreground">{user?.email}</p>
-                                </div>
-                            </div>
+          </div>
+        </div>
 
                             <Separator />
                             
@@ -124,9 +124,9 @@ export const UserProfileSheet = () => {
                                 </Button>
                             </div>
                         </motion.div>
-                    </SheetContent>
+      </SheetContent>
                 )}
             </AnimatePresence>
-        </Sheet>
-    );
+    </Sheet>
+  );
 };

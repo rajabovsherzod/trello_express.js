@@ -22,7 +22,7 @@ class UserController {
     }
 
     login = async (req, res, next) => {
-        try {
+       try {
             const { email, username, password } = req.body
             const userData = await this.userService.login({ email, username, password })
 
@@ -31,9 +31,9 @@ class UserController {
                 httpOnly: true,
             })
             return res.json(userData)
-        } catch (error) {
+       } catch (error) {
             next(error)
-        }
+       }
     }
 
     refresh = async (req, res, next) => {

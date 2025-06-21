@@ -39,10 +39,14 @@ export const BoardCard = ({ boardId, title, authorName, background, memberCount 
     }, [background, isUrl]);
 
     const textColor = useMemo(() => {
+        // This only works for solid colors, not for URLs
+        if (isUrl) return 'text-white';
         const brightness = getBrightness(displayBackground);
-        return brightness > 128 ? 'text-black' : 'text-white';
-    }, [displayBackground]);
+        return brightness > 150 ? 'text-black' : 'text-white';
+    }, [displayBackground, isUrl]);
     
+    const isTextWhite = textColor === 'text-white';
+
     const cardStyle = isUrl && !imageError 
         ? { backgroundImage: `url(${displayBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }
         : { backgroundColor: displayBackground };
@@ -70,8 +74,13 @@ export const BoardCard = ({ boardId, title, authorName, background, memberCount 
                     )}
                     style={cardStyle}
                 >
-                    {/* Orqa fondagi naqshlar */}
-                    <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                    {/* Overlay for background images to ensure text readability */}
+                    {isUrl && <div className="absolute inset-0 bg-black/40 z-0" />}
+
+                    {/* Orqa fondagi naqshlar - faqat matn oq bo'lganda ko'rsatiladi */}
+                    {isTextWhite && (
+                        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-20 group-hover:opacity-30 transition-opacity z-0"></div>
+                    )}
                     
                     <div className="relative z-10">
                         <h3 className="font-bold text-xl line-clamp-2 leading-tight [text-shadow:_0_1px_4px_rgb(0_0_0_/_30%)]">{title}</h3>
@@ -93,8 +102,8 @@ export const BoardCard = ({ boardId, title, authorName, background, memberCount 
                         <Heart size={16} className="group-hover:fill-red-500 group-hover:text-red-500 transition-colors" />
                     </div>
 
-                    {/* Hover effekti */}
-                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    {/* Hover effekti - endi barcha kartalar uchun ishlaydi */}
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20">
                         <span className="font-bold text-white text-lg">Open Board</span>
                     </div>
                 </motion.div>

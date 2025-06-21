@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { refreshToken as refreshTokenApi } from './api/auth';
 import { userAuthStore } from './store/auth.store';
 import { Footer } from '@/components/shared/Footer';
+import { cn } from '@/lib/utils';
 
 function App() {
   const { refreshToken, setTokens, logout } = userAuthStore();
@@ -38,15 +39,21 @@ function App() {
 
   }, [refreshToken, setTokens, logout]);
 
+  const isBoardPage = location.pathname.startsWith('/board');
+  const isAuthPage = location.pathname.startsWith('/auth');
+
   return (
     <ThemeProvider defaultTheme="dark" storageKey="trello-theme-final">
       <Toaster />
-      <div className="relative flex min-h-screen flex-col bg-background">
-        <Navbar />
-        <main className="flex-1 pt-14">
+      <div className="flex min-h-screen flex-col bg-background">
+        {!isBoardPage && <Navbar />}
+        <main className={cn(
+          "flex-grow",
+          !isBoardPage && "pt-14"
+        )}>
           <Outlet />
         </main>
-        {!location.pathname.startsWith('/auth') && <Footer />}
+        {!isAuthPage && !isBoardPage && <Footer />}
       </div>
     </ThemeProvider>
   );

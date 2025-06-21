@@ -75,6 +75,23 @@
   }
 }
 
+/* WOOOOOOW PRO MAX ELITE Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--secondary) / 0.5);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--accent));
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--ring));
+}
+
 /* Shimmer effekti uchun animatsiya */
 @keyframes shimmer {
   from {

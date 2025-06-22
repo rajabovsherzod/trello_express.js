@@ -83,12 +83,27 @@ class CardController{
     reorderCardsInList = async (req, res, next) => {
         try {
             const { listId } = req.params
-            const { orderedCardIds } = req.body
+            const { cards } = req.body
             const userId = req.user.id
 
-            await this.cardService.reorderCardsInList(listId, orderedCardIds, userId)
+            await this.cardService.reorderCardsInList(listId, cards, userId)
             res.status(200).json({
                 message: 'Cards reordered successfully'
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    moveCard = async (req, res, next) => {
+        try {
+            const { cardId } = req.params
+            const { newListId, newPosition } = req.body
+            const userId = req.user.id
+
+            await this.cardService.moveCard(cardId, newListId, newPosition, userId)
+            res.status(200).json({
+                message: 'Card moved successfully'
             })
         } catch (error) {
             next(error)

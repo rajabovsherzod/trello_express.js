@@ -79,9 +79,9 @@ class ListController {
         try {
             const { boardId } = req.params
             const userId = req.user.id
-            const { orderListIds } = req.body
+            const { lists } = req.body
 
-            await this.listService.reorderLists(boardId, userId, orderListIds)
+            await this.listService.reorderLists(boardId, userId, lists)
             res.status(200).json({
                 message: 'Lists reordered successfully'
             })

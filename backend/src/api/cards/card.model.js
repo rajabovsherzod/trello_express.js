@@ -39,6 +39,22 @@ const CardSchema = new Schema({
     timestamps: true
 })
 
+
+CardSchema.statics.decrementPositions = async function(listId, fromPosition) {
+ return this.updateMany(
+   { listId: listId, position: { $gt: fromPosition } },
+   { $inc: { position: -1 } }
+ );
+};
+
+CardSchema.statics.incrementPositions = async function(listId, fromPosition) {
+    return this.updateMany(
+      { listId: listId, position: { $gte: fromPosition } },
+      { $inc: { position: 1 } }
+    );
+};
+
+
 const CardModel = model('Card', CardSchema)
 
 export default CardModel

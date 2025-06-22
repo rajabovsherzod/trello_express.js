@@ -4,10 +4,11 @@ import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
 import type { Card as CardType } from '@/types';
 
-export interface Card {
-  id: string;
-  title: string;
-}
+// Bu interfeys endi kerak emas, chunki CardType'dan foydalanyapmiz
+// export interface Card {
+//   id: string;
+//   title: string;
+// }
 
 interface CardComponentProps {
   card: CardType;
@@ -35,12 +36,12 @@ const CardComponent: React.FC<CardComponentProps> = ({ card, isOverlay }) => {
     transition,
   };
 
-  // Sudralayotgan elementning asl joyida qoladigan bo'shliq
+  // Sudralayotgan elementning asl joyida qoladigan "plakat"
   if (isDragging && !isOverlay) {
     return (
       <div
         ref={setNodeRef}
-        className="h-[60px] rounded-xl bg-white/10 border-2 border-dashed border-white/20"
+        className="h-full min-h-[60px] rounded-xl bg-white/5 border-2 border-dashed border-white/20"
       />
     );
   }
@@ -52,17 +53,18 @@ const CardComponent: React.FC<CardComponentProps> = ({ card, isOverlay }) => {
       {...attributes}
       {...listeners}
       className={cn(
-        "p-4 rounded-xl border bg-neutral-900/80 border-neutral-700/60 cursor-grab active:cursor-grabbing",
-        isDragging && "opacity-50 ring-2 ring-rose-500",
-        isOverlay && "ring-2 ring-rose-500 shadow-xl"
+        "p-4 rounded-xl border relative bg-neutral-900/80 border-neutral-700/60 cursor-grab active:cursor-grabbing",
+        // Qizil 'ring-rose-500'ni chiroyli 'ring-cyan-400'ga alishtiramiz
+        isDragging && "opacity-50",
+        isOverlay && "ring-2 ring-cyan-400 shadow-xl"
       )}
     >
       <p className="text-sm font-medium text-neutral-200">{card.name}</p>
       
-      {/* Hover Glow Effect */}
+      {/* Hover effekti uchun alohida div */}
       <div className="absolute -inset-px rounded-xl bg-gradient-to-r from-cyan-500/50 to-teal-500/50 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
     </div>
   );
 };
 
-export default CardComponent; 
+export default CardComponent;

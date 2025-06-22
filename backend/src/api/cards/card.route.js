@@ -8,5 +8,6 @@ const router = Router()
 router.put('/:cardId', authMiddleware, CardController.updateCard)
 router.delete('/:cardId', authMiddleware, CardController.deleteCard)
 router.get('/:cardId', authMiddleware, cardController.getCardById)
+router.patch('/:cardId/move', authMiddleware, cardController.moveCard)
 
 export default router 

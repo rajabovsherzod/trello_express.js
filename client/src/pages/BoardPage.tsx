@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, closestCorners } from '@dnd-kit/core';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
-import { SortableContext } from '@dnd-kit/sortable';
+import { SortableContext, arrayMove } from '@dnd-kit/sortable';
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 
@@ -19,6 +19,7 @@ import CardComponent from '@/components/board/CardComponent';
 import { AddListForm } from '@/components/board/AddListForm';
 import { SidebarProvider, Sidebar } from '@/components/ui/sidebar';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import { reorderLists, reorderCards, moveCard } from '@/api/board-dnd-api';
 
 import type { List, Card, Board } from '@/types';
 
@@ -39,6 +40,30 @@ const BoardPage = () => {
     queryFn: () => getBoardById(boardId!),
     enabled: !!boardId,
   });
+
+  const { mutate: reorderListsMutation } = useMutation({
+    mutationFn: reorderLists,
+    onError: (error) => {
+      toast.error("Failed to reorder lists: " + error.message)
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] })
+    }
+  })
+
+  const { mutate: reorderCardsMutation } = useMutation({
+    mutationFn: reorderCards,
+    onError: (error) => {
+      toast.error("Failed to reorder cards: " + error.message)
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] })
+    }
+  })
+
+  const { mutate: moveCardMutation } = useMutation({
+    mutationFn: moveCard,
+    onError: (error) => {
+      toast.error("Failed to move card: " + error.message)
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] })
+    }
+  })
 
   const { mutate: createListMutation, isPending: isCreatingList } = useMutation({
     mutationFn: createList,
@@ -63,10 +88,79 @@ const BoardPage = () => {
     if (type === 'Card') setActiveCard(event.active.data.current?.item);
   }, []);
   
-  const onDragEnd = useCallback((event: DragEndEvent) => {
+  const onDragEnd = (event: DragEndEvent) => {
     setActiveList(null);
     setActiveCard(null);
-  }, []);
+    const { active, over } = event;
+
+    if (!over || !boardData || !boardData.lists) { // Eng muhim tekshiruv: lists mavjudligini ham qo'shamiz
+      return;
+    }
+    
+    const activeId = String(active.id);
+    const overId = String(over.id);
+    if (activeId === overId) return;
+
+    const isActiveAList = active.data.current?.type === 'List';
+    const isActiveACard = active.data.current?.type === 'Card';
+
+    // HOLAT 1: LISTNI SUDRAGANDA
+    if (isActiveAList) {
+        const oldIndex = boardData.lists.findIndex((l) => l._id === activeId);
+        const newIndex = boardData.lists.findIndex((l) => l._id === overId);
+        if (oldIndex === -1 || newIndex === -1) return;
+        
+        const updatedLists = arrayMove(boardData.lists, oldIndex, newIndex);
+        
+        queryClient.setQueryData(['board', boardId], { ...boardData, lists: updatedLists });
+        reorderListsMutation({
+            boardId: boardId!,
+            lists: updatedLists.map((list, index) => ({ _id: list._id, position: index })),
+        });
+    }
+
+    // HOLAT 2: KARTANI SUDRAGANDA
+    if (isActiveACard) {
+        const sourceList = boardData.lists.find((l) => l.cards.some((c) => c._id === activeId));
+        const destinationList = boardData.lists.find((l) => l.cards.some((c) => c._id === overId) || l._id === overId);
+        if (!sourceList || !destinationList) return;
+        
+        // HOLAT 2A: BITTA LIST ICHIDA
+        if (sourceList._id === destinationList._id) {
+            const reorderedCards = arrayMove(sourceList.cards, sourceList.cards.findIndex(c => c._id === activeId), destinationList.cards.findIndex(c => c._id === overId));
+            const newLists = boardData.lists.map(l => (l._id === sourceList._id ? { ...l, cards: reorderedCards } : l));
+            queryClient.setQueryData(['board', boardId], { ...boardData, lists: newLists });
+            reorderCardsMutation({
+                listId: sourceList._id,
+                cards: reorderedCards.map((card, index) => ({ _id: card._id, position: index })),
+            });
+        } 
+        // HOLAT 2B: LISTLAR ORASIDA
+        else {
+            const sourceCards = [...sourceList.cards];
+            const cardIndex = sourceCards.findIndex((c) => c._id === activeId);
+            const [movedCard] = sourceCards.splice(cardIndex, 1);
+            if (!movedCard) return;
+
+            const destinationCards = [...destinationList.cards];
+            let overCardIndex = destinationCards.findIndex((c) => c._id === overId);
+            if (overCardIndex === -1) overCardIndex = destinationCards.length;
+            destinationCards.splice(overCardIndex, 0, movedCard);
+
+            const newLists = boardData.lists.map((l) => {
+              if (l._id === sourceList._id) return { ...l, cards: sourceCards };
+              if (l._id === destinationList._id) return { ...l, cards: destinationCards };
+              return l;
+            });
+            queryClient.setQueryData(['board', boardId], { ...boardData, lists: newLists });
+            moveCardMutation({
+                cardId: activeId,
+                newListId: destinationList._id,
+                newPosition: overCardIndex,
+            });
+        }
+    }
+  };
   
   const handleAddList = (name: string) => {
     if (!boardId) return;
@@ -146,7 +240,7 @@ const BoardPage = () => {
               </div>
               <DragOverlay>
                 {activeList ? <ListComponent list={activeList} isOverlay /> : null}
-                {activeCard ? <CardComponent card={card} isOverlay /> : null}
+                {activeCard ? <CardComponent card={activeCard} isOverlay /> : null}
               </DragOverlay>
             </DndContext>
           </main>

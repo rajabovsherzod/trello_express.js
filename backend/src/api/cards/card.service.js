@@ -187,6 +187,31 @@ class CardService{
             throw new ApiError(500, 'Failed to reorder cards')
         }
     }
+
+    async moveCard(cardId, newListId, newPosition, userId){
+        const cardToMove = await CardModel.findById(cardId)
+        const board = await BoardModel.findById(cardToMove.boardId)
+        if(!board){
+            throw new ApiError(404, 'Board not found')
+        }
+        if(!board.members.includes(userId)){
+            throw new ApiError(403, 'Forbidden: You are not a member of this board')
+        }
+
+        const oldList = cardToMove.listId.toString()
+        if(oldList === newListId){
+            throw new ApiError(400, 'Card is already in this list')
+        }
+
+        await CardModel.decrementPositions(oldList, cardToMove.position)
+        await CardModel.incrementPositions(newListId, newPosition)
+
+        cardToMove.listId = newListId
+        cardToMove.position = newPosition
+        await cardToMove.save()
+
+        return cardToMove
+    }
 }
 
 export default new CardService()

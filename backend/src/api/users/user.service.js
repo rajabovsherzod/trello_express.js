@@ -50,14 +50,14 @@ class UserService {
 
     async refresh(refreshToken) {
         if (!refreshToken) {
-            throw ApiError.UnauthorizedError()
+            throw new ApiError(401, 'User is not authorized');
         }
 
         const userData = validateRefreshToken(refreshToken)
         const tokenFromDb = await findToken(refreshToken)
 
         if (!userData || !tokenFromDb) {
-            throw ApiError.UnauthorizedError()
+            throw new ApiError(401, 'User is not authorized');
         }
 
         const user = await userModel.findById(userData.id)

@@ -27,34 +27,42 @@ $api.interceptors.request.use((config) => {
 });
 
 // Token muddati o'tganda avtomatik yangilash uchun interceptor
+// Token muddati o'tganda avtomatik yangilash uchun interceptor
 $api.interceptors.response.use(
     (response) => {
         return response;
     },
     async (error) => {
         const originalRequest = error.config;
-        if (error.response.status === 401 && error.config && !error.config._isRetry) {
+
+        // Agar xato 401 (Unauthorized) bo'lsa va bu qayta urinish bo'lmasa
+        if (error.response.status === 401 && !originalRequest._isRetry) {
             originalRequest._isRetry = true;
             try {
-                const { setTokens, logout } = userAuthStore.getState();
+                // Yangi tokenlar olish uchun so'rov yuboramiz. 
+                // Bu so'rov o'zi bilan cookie'dagi refreshToken'ni avtomatik olib ketadi.
                 const { data } = await $axios.post('/users/refresh'); 
 
-                if (data.accessToken && data.refreshToken) {
-                    setTokens(data.accessToken, data.refreshToken, data.user);
-                    // Muvaffaqiyatsiz tugagan so'rovni yangi token bilan qayta yuborish
+                // Agar backend yangi accessToken va user ma'lumotlarini qaytarsa
+                if (data.accessToken && data.user) {
+                    // Store'dagi setTokens funksiyasini to'g'ri chaqiramiz
+                    userAuthStore.getState().setTokens(data.accessToken, data.user);
+                    
+                    // Asl, muvaffaqiyatsiz so'rovning sarlavhasini yangi token bilan yangilaymiz
                     originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+                    
+                    // Va o'sha so'rovni qayta yuboramiz
                     return $api.request(originalRequest);
-                } else {
-                    logout();
-                    return Promise.reject(error);
                 }
-
             } catch (refreshError) {
                 console.error("Could not refresh token:", refreshError);
+                // Agar refresh ham ishlamasa, demak sessiya tugagan, logout qilamiz
                 userAuthStore.getState().logout();
                 return Promise.reject(refreshError);
             }
         }
+        
+        // Agar xato 401 bo'lmasa yoki bu qayta urinish bo'lsa, xatoni shunchaki qaytaramiz
         return Promise.reject(error);
     }
 );

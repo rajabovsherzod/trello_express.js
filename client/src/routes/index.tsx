@@ -6,6 +6,8 @@ import DashboardPage from '@/pages/DashboardPage';
 import BoardPage from '@/pages/BoardPage';
 import ProtectedRoute from './ProtectedRoute';
 import GuestRoute from './GuestRoute';
+import VerifyEmailPage from '@/pages/VerifyEmailPage';
+import CompleteRegistrationPage from '@/pages/CompleteRegistrationPage';
 
 export const router = createBrowserRouter([
   {
@@ -25,9 +27,17 @@ export const router = createBrowserRouter([
             path: 'auth',
             element: <AuthPage />,
           },
+          {
+            path: 'verify-email',
+            element: <VerifyEmailPage />,
+          },
+          {
+            path: 'auth/complete-registration',
+            element: <CompleteRegistrationPage />,
+          },
         ]
       },
-      // Routes for authenticated users
+
       {
         element: <ProtectedRoute />,
         children: [

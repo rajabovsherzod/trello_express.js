@@ -1,56 +1,70 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/shared/Navbar';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { Toaster } from 'sonner';
 import { useEffect } from 'react';
-import { refreshToken as refreshTokenApi } from './api/auth';
+import { me } from './api/auth'; // Import nomini soddalashtiramiz
 import { userAuthStore } from './store/auth.store';
 import { Footer } from '@/components/shared/Footer';
 import { cn } from '@/lib/utils';
 
 function App() {
-  const { refreshToken, setTokens, logout } = userAuthStore();
+  const { setTokens, logout } = userAuthStore();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      if (!refreshToken) {
-        // Agar store'da refresh token bo'lmasa, hech nima qilmaymiz yoki logout qilamiz
-        // Bu holatda foydalanuvchi shundoq ham himoyalangan sahifalarga kira olmaydi
-        return;
-      }
+    const accessToken = searchParams.get('accessToken');
+    
+    // Agar URL'da token bo'lsa, shu blok ishlaydi
+    if (accessToken) {
+      console.log("Found accessToken in URL:", accessToken);
 
-      try {
-        const { user, accessToken, refreshToken: newRefreshToken } = await refreshTokenApi(refreshToken);
-        setTokens(accessToken, newRefreshToken, user);
-      } catch (error) {
-        console.error("Failed to refresh token:", error);
-        logout(); // Token yaroqsiz bo'lsa, tizimdan chiqarib yuboramiz
-      }
-    };
+      const validateToken = async (token: string) => {
+        try {
+          // 1. Tokkeni vaqtinchalik store'ga qo'yamiz
+          setTokens(token, null); 
+          console.log("Token set in store temporarily.");
 
-    // Har 29 daqiqada tokenni yangilab turish (30 daqiqalik access token uchun)
-    const interval = setInterval(() => {
-        checkAuth();
-    }, 29 * 60 * 1000); 
+          // 2. /me so'rovini yuboramiz
+          console.log("Calling 'me' API...");
+          const userData = await me();
+          console.log("User data received:", userData);
+          
+          // 3. To'liq ma'lumot bilan store'ni yangilaymiz
+          setTokens(token, userData);
 
-    // Komponent yo'q qilinganda intervalni tozalash
-    return () => clearInterval(interval);
+          // 4. URL'ni tozalaymiz
+          const newSearchParams = new URLSearchParams(searchParams);
+          newSearchParams.delete('accessToken');
+          setSearchParams(newSearchParams, { replace: true });
+          
+          console.log("Redirecting to dashboard...");
+          navigate('/dashboard', { replace: true });
+        } catch (error) {
+          console.error("Token validation failed:", error);
+          logout();
+          const newSearchParams = new URLSearchParams(searchParams);
+          newSearchParams.delete('accessToken');
+          setSearchParams(newSearchParams, { replace: true });
+        }
+      };
 
-  }, [refreshToken, setTokens, logout]);
+      validateToken(accessToken);
+    }
+  }, [searchParams, setSearchParams, setTokens, logout, navigate]);
+
 
   const isBoardPage = location.pathname.startsWith('/board');
-  const isAuthPage = location.pathname.startsWith('/auth');
+  const isAuthPage = location.pathname.startsWith('/auth') || location.pathname.startsWith('/verify-email');
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="trello-theme-final">
       <Toaster />
       <div className="flex min-h-screen flex-col bg-background">
         {!isBoardPage && <Navbar />}
-        <main className={cn(
-          "flex-grow",
-          !isBoardPage && "pt-14"
-        )}>
+        <main className={cn( "flex-grow", !isBoardPage && "pt-14" )}>
           <Outlet />
         </main>
         {!isAuthPage && !isBoardPage && <Footer />}

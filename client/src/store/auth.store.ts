@@ -2,10 +2,18 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { IUser } from "@/types";
 
-// Brauzerda xavfsiz tarzda tokenlarni olish uchun yordamchi funksiyalar
-const getInitialToken = (key: string) => {
+const getInitialAccessToken = () => {
     if (typeof window !== 'undefined') {
-        return localStorage.getItem(key);
+        const storageValue = localStorage.getItem('auth-storage');
+        if (storageValue) {
+            try {
+                const { state } = JSON.parse(storageValue);
+                return state.accessToken || null;
+            } catch (error) {
+                console.error("Error parsing auth-storage from localStorage", error);
+                return null;
+            }
+        }
     }
     return null;
 }
@@ -13,57 +21,52 @@ const getInitialToken = (key: string) => {
 interface AuthStore {
     user: IUser | null;
     accessToken: string | null;
-    refreshToken: string | null;
     isAuthenticated: boolean;
-    login: (userData: IUser, accessToken: string, refreshToken: string) => void;
+    // O'zgarish mana shu ikki qatorda: user endi 'IUser | null' bo'lishi mumkin
+    login: (userData: IUser, accessToken: string) => void;
     logout: () => void;
-    setTokens: (accessToken: string, refreshToken: string, user: IUser) => void;
+    setTokens: (accessToken: string, user: IUser | null) => void;
 }
 
-const initialAccessToken = getInitialToken('accessToken');
-const initialRefreshToken = getInitialToken('refreshToken');
+const initialAccessToken = getInitialAccessToken();
 
 export const userAuthStore = create<AuthStore>()(
     persist(
         (set) => ({
             user: null,
             accessToken: initialAccessToken,
-            refreshToken: initialRefreshToken,
             isAuthenticated: !!initialAccessToken,
-            login: (userData, accessToken, refreshToken) => {
-                localStorage.setItem('accessToken', accessToken);
-                localStorage.setItem('refreshToken', refreshToken);
+
+            login: (userData, accessToken) => {
                 set({
                     user: userData,
                     accessToken,
-                    refreshToken,
                     isAuthenticated: true,
                 });
             },
+
             logout: () => {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
                 set({
                     user: null,
                     accessToken: null,
-                    refreshToken: null,
                     isAuthenticated: false,
                 });
             },
-            setTokens: (accessToken, refreshToken, user) => {
-                localStorage.setItem('accessToken', accessToken);
-                localStorage.setItem('refreshToken', refreshToken);
+
+            // Bu funksiya endi 'user' uchun 'null'ni ham qabul qila oladi
+            setTokens: (accessToken, user) => {
                 set({
                     user,
                     accessToken,
-                    refreshToken,
-                    isAuthenticated: true,
+                    // Agar user null bo'lsa ham, token borligi uchun 'true' bo'ladi
+                    isAuthenticated: !!accessToken,
                 });
             },
         }),
         {
             name: 'auth-storage',
             storage: createJSONStorage(() => localStorage),
+            partialize: (state) => ({ user: state.user, accessToken: state.accessToken }),
         }
     )
 );

@@ -43,3 +43,13 @@ export interface Board {
   updatedAt: string;
   lists?: List[];
 }
+
+export interface Invitation {
+    _id: string
+    boardId: Board | string
+    fromUser: IUser | string
+    toUserEmail: string
+    status: 'pending' | 'accepted' | 'declined'
+    createdAt: string
+    updatedAt: string
+}

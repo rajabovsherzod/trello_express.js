@@ -6,7 +6,7 @@ import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-w
 import { LoginForm } from "@/components/auth/LoginForm";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import type { LoginFormValues, RegisterFormValues } from "@/lib/validations";
-import { useMutation } from "@tanstack/react-query"; 
+import { useMutation, useQueryClient } from "@tanstack/react-query"; 
 import { userAuthStore } from "@/store/auth.store";
 import { loginUser, registerUser } from "@/api/auth";
 import { toast } from "sonner";
@@ -17,14 +17,14 @@ const AuthPage = () => {
   const [mode, setMode] = useState<"login" | "register">("login");
   const navigate = useNavigate()
   const loginUserStore = userAuthStore((state) => state.login);
+  const queryClient = useQueryClient();
 
   const {mutate: register, isPending: registerPending} = useMutation({
     mutationKey: ["register"],
     mutationFn: registerUser,
-    onSuccess: (data) => {
-      loginUserStore(data.user, data.accessToken, data.refreshToken) 
-      navigate('/dashboard');
-      toast.success("You have successfully registered")
+    onSuccess: (data, variables) => {
+      toast.success("Registration successful! Please check your email.")
+      navigate('/verify-email', { state: { email: variables.email }, replace: true });
     },
     onError: (error) => {
       toast.error("Registration failed", {
@@ -37,7 +37,8 @@ const AuthPage = () => {
     mutationKey: ["login"],
     mutationFn: loginUser,
     onSuccess: (data) => {
-      loginUserStore(data.user, data.accessToken, data.refreshToken)
+      loginUserStore(data.user, data.accessToken)
+      queryClient.invalidateQueries({ queryKey: ['invitations'] });
       navigate('/dashboard');
       toast.success("You have successfully logged in")
     },
@@ -97,14 +98,14 @@ const AuthPage = () => {
           <div className="text-center text-sm text-muted-foreground">
             {mode === "login" ? (
               <>
-                Don't have an account?{" "}
+                Don't have an account?{" "}
                 <Button variant="link" className="p-0" onClick={() => setMode("register")}>
                   Sign up
                 </Button>
               </>
             ) : (
               <>
-                Already have an account?{" "}
+                Already have an account?{" "}
                 <Button variant="link" className="p-0" onClick={() => setMode("login")}>
                   Login
                 </Button>
@@ -124,13 +125,18 @@ const AuthPage = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="w-full" disabled={isPending}>
+          <Button variant="outline" className="w-full" disabled={isPending} asChild>
+            <a href="http://localhost:5000/api/users/auth/google">
+              <svg role="img" viewBox="0 0 24 24" className="mr-2 h-4 w-4"><path fill="currentColor" d="M12.48 10.92v3.28h7.84c-.24 1.84-.85 3.18-1.73 4.1-1.05 1.05-2.36 1.67-4.04 1.67-3.27 0-5.93-2.66-5.93-5.93s2.66-5.93 5.93-5.93c1.53 0 2.75.57 3.65 1.45l2.42-2.42C16.82 3.3 14.86 2.5 12.48 2.5c-5.47 0-9.91 4.43-9.91 9.91s4.44 9.91 9.91 9.91c2.75 0 4.99-.95 6.69-2.66 1.76-1.76 2.6-4.15 2.6-6.81 0-.57-.05-.92-.12-1.31H12.48z"></path></svg>
               Google
-            </Button>
-            <Button variant="outline" className="w-full" disabled={isPending}>
+            </a>
+          </Button>
+          <Button variant="outline" className="w-full" disabled={isPending} asChild>
+            <a href="http://localhost:5000/api/users/auth/github">
               <Github className="mr-2 h-4 w-4" />
               GitHub
-            </Button>
+            </a>
+          </Button>
           </div>
         </div>
       </div>

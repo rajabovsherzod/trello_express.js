@@ -5,6 +5,8 @@ import mongoose from "mongoose";
 import cookieParser from 'cookie-parser'
 import apiRoutes from "./routes/index.js";
 import errorHandler from '../src/middlewares/error.middleware.js';
+import passport from 'passport'
+import { configurePassport } from './config/passport.config.js';
 
 dotenv.config();
 
@@ -19,7 +21,9 @@ const corsOptions = {
 app.use(cors(corsOptions))
 app.use(express.json())
 app.use(cookieParser())
+app.use(passport.initialize())
 
+configurePassport(passport)
 
 app.use('/api', apiRoutes)
 app.use(errorHandler)

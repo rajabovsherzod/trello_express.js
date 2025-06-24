@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react'; // React'ni import qilish
+import { ShareBoardModal } from './ShareBoardModal';
 import { Star, Users, MoreHorizontal, Filter, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -18,8 +19,10 @@ interface BoardHeaderProps {
 
 const BoardHeader: React.FC<BoardHeaderProps> = ({ board }) => {
   const { toggleSidebar } = useSidebar();
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   
   return (
+    <>
     <header className="hidden lg:flex h-14 flex-shrink-0 items-center justify-between bg-gradient-to-b from-black/50 to-black/10 px-4 md:h-16 md:px-6 backdrop-blur-lg">
       <div className="flex items-center gap-2 md:gap-4">
         <TooltipProvider delayDuration={0}>
@@ -69,7 +72,7 @@ const BoardHeader: React.FC<BoardHeaderProps> = ({ board }) => {
         <Button variant="secondary" className="hidden md:flex gap-2 bg-white/10 text-white hover:bg-white/20">
           <Filter className="h-4 w-4" /> Filter
         </Button>
-        <Button variant="secondary" className="gap-2 bg-white/10 text-white hover:bg-white/20">
+        <Button variant="secondary" className="gap-2 bg-white/10 text-white hover:bg-white/20" onClick={() => setIsShareModalOpen(true)}>
           <Users className="h-4 w-4" /> <span className="hidden md:inline">Share</span>
         </Button>
         <Button 
@@ -82,6 +85,12 @@ const BoardHeader: React.FC<BoardHeaderProps> = ({ board }) => {
         </Button>
       </div>
     </header>
+    <ShareBoardModal 
+        isOpen={isShareModalOpen} 
+        onClose={() => setIsShareModalOpen(false)}
+        boardId={board._id!}
+    />
+    </>
   );
 };
 

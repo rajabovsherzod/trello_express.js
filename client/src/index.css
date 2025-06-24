@@ -105,3 +105,39 @@
 .animate-shimmer {
     animation: shimmer 2s linear infinite;
 }
+
+/* ============================================= */
+[data-radix-popper-content-wrapper] {
+  z-index: 100 !important;
+}
+
+[data-side="bottom"][data-align="end"] > div {
+  /* Fon: yarim-shaffof, --background rangiga yaqin */
+  background-color: hsla(165, 25%, 6%, 0.8) !important; 
+  backdrop-filter: blur(8px) !important;
+  /* Chegara: --border rangiga yaqin */
+  border-color: hsl(160, 30%, 15%) !important;
+  /* Asosiy matn rangi */
+  color: hsl(160, 15%, 75%) !important;
+}
+
+/* Dropdown ichidagi barcha matnlarga umumiy rang beramiz */
+[data-side="bottom"][data-align="end"] > div * {
+  color: hsl(160, 15%, 75%) !important;
+}
+
+/* Sarlavha matni (Invitations) */
+[data-side="bottom"][data-align="end"] [data-radix-dropdown-menu-label] {
+  color: hsl(0, 0%, 100%) !important; /* Toza oq rang */
+  font-weight: 600 !important;
+}
+
+/* Ajratuvchi chiziq */
+[data-side="bottom"][data-align="end"] [data-radix-dropdown-menu-separator] {
+  background-color: hsl(160, 30%, 15%) !important; /* --border rangi */
+}
+
+/* Element ustiga sichqoncha kelganda (focus) */
+[data-side="bottom"][data-align="end"] [data-radix-dropdown-menu-item]:focus {
+  background-color: hsl(160, 30%, 22%) !important; /* --accent rangi */
+}
